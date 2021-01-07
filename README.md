@@ -1,2 +1,3 @@
-# minigame-src
-Minigame Source files
+# MINIGAME PRIVACY
+
+Source files
