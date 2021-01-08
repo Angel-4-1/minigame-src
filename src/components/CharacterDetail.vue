@@ -25,7 +25,7 @@
                     <div class="right">{{ character.data }}</div>
                 </div>
 
-                <h3>Types</h3>
+                <h3>Abilities</h3>
                 <div class="types">
                     <div class="type">{{ character.ability }}</div>
                     <div class="type">{{ character.ability }}</div>
@@ -36,8 +36,8 @@
 
             <!-- Botones parte inferior -->
             <div class="buttons">
-                <button class="btn btn-close" @click="closeDetail">X</button>
-                <button class="btn btn-accept" @click="characterIsSelected">YES</button>
+                <button class="btn btn-close" @click="closeDetail"></button>
+                <button class="btn btn-accept" @click="characterIsSelected"></button>
             </div>
             
         </div>
@@ -118,7 +118,7 @@ h3 {
     max-width: 510px;
     padding: 50px 0 0;
     background-color: #ffffff;
-    border-radius: 5px;
+    border-radius: 10px;
 }
 
 /*IMAGEN*/
@@ -198,22 +198,30 @@ h3 {
 .detail .buttons .btn {
     outline: none;
     border: none;
-    border-radius: 25%;
+    border-radius: 50%;
     color: #efefef;
     padding: 10px;
     margin-bottom: 20px;
     font-size: 1.5rem;
     cursor: pointer;
+    width: 60px;
+    height: 60px;
 }
 
 /*BOTON PARA CERRAR*/
 .detail .buttons .btn-close {
-    background-color: #ff0000;
+    background-image: url('../assets/cross.png');
+    background-size: cover;
 }
 
 /*BOTON PARA ACEPTAR*/
 .detail .buttons .btn-accept {
-    background-color: #14c214;
+    background-image: url('../assets/check.png');
+    background-size: cover;
+}
+
+.detail .buttons .btn-accept:hover, .detail .buttons .btn-close:hover {
+    opacity: 0.5;
 }
 
 </style>

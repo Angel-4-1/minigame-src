@@ -245,7 +245,7 @@ export default {
   margin: 0;
   height: 30%;
   width: 100%;
-  background: chartreuse;
+  background: rgb(175, 171, 116);
   border-radius: 10px;
 }
 
@@ -257,7 +257,7 @@ export default {
   color: #000000; 
   height: 50%;
   width: 100%;
-  background: rgb(217, 255, 0);
+  background: rgb(229, 210, 155);
   border-radius: 10px;
 }
 
