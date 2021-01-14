@@ -49,20 +49,25 @@ export default {
     transform: translate(-50%, -50%);
     bottom: 20%;
 
-    background-color: #00ffff;
     padding: 10px;
-    border-radius: 10px;
-    outline: none;
-    border: none;
+    
     text-decoration: none;
     color: #000000;
     padding: 10px;
     margin-top: 10px;
     font-size: 1.5rem;
     cursor: pointer;
+
+    outline: none;
+    border: none;
+    border-radius: 20px;
+    background: rgb(122, 235, 235);
+    border: 3px solid rgb(255, 255, 255);
+    font-size: 3vh;
 }
 
 .play-button:hover {
-    background-color: #10b8b8;
+    background: rgb(106, 141, 236);
+    color: white;
 }
 </style>

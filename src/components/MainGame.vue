@@ -4,8 +4,11 @@
 <!--Otras letras: Wendy One, Acme, Coiny, Righteous, Lilita One-->
 
     <div class="container">
-        <CanvasExample :characterID="characterID" />
-        <!--
+        
+        <Example :characterID="characterID" />
+        <!-- <CanvasExample :characterID="characterID" /> 
+        <canvas id="canvas1"></canvas>
+
         <div class="header">
             <div class="header-left"></div>
             <div class="puntuation">
@@ -53,12 +56,14 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 import { STAGES, CHARACTERS, LEVELS } from '@/consts.js';
-import CanvasExample from '@/components/CanvasExample.vue'
+import CanvasExample from '@/components/CanvasExample.vue';
+import Example from '@/components/Example.vue';
 
 export default {
     name: 'MainGame',
     components: {
-        CanvasExample
+        CanvasExample,
+        Example
     },
     props: [
         'levelID',
@@ -122,16 +127,43 @@ export default {
         }
     },
     created() {
-        window.requestAnimationFrame(this.steps)
+        //window.requestAnimationFrame(this.steps)
+        /*
+        let birdScript = document.createElement('script');
+        birdScript.setAttribute('src', '../flappybird/bird.js');
+        document.head.appendChild(birdScript);
+        let p = document.createElement('script');
+        p.setAttribute('src', '../flappybird/particles.js');
+        document.head.appendChild(p);
+        let o = document.createElement('script');
+        o.setAttribute('src', '../flappybird/obstacles.js');
+        document.head.appendChild(o);
+        let m = document.createElement('script');
+        m.setAttribute('src', '../flappybird/main.js');
+        document.head.appendChild(m);*/
     },
     mounted() {
-        this.$nextTick(() => {
-            window.addEventListener('resize', this.onResize);
-        })
+        //this.$nextTick(() => {
+         //   window.addEventListener('resize', this.onResize);
+        //})
+        
     },
     beforeUnmount() { 
-        window.removeEventListener('resize', this.onResize); 
+        //window.removeEventListener('resize', this.onResize); 
     }
+    /*
+    created() {
+    var scripts = [
+      "https://cloudfront.net/js/jquery-3.4.1.min.js",
+      "js/local.js"
+    ];
+    scripts.forEach(script => {
+      let tag = document.createElement("script");
+      tag.setAttribute("src", script);
+      document.head.appendChild(tag);
+    });
+  }
+  */
 }
 </script>
 
