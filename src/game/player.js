@@ -108,6 +108,10 @@ export class Player {
         this.handleParticle(ctx);
     }
 
+    drawHitVersion( ctx ) {
+        this.sprite
+    }
+
     mousedown(x, y) {
         //true = se ha de mover  |  false = se queda quieto
         //Donde estan estas coordenadas respecto al player ?

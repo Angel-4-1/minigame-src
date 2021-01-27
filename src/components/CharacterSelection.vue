@@ -2,19 +2,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <!-- <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet"> -->
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
-    <div class="selection-div">
-        <CharacterList 
-            :imageUrl="imageUrl" 
-            @setCharacterID="setCharacterID"/>
-
-        <transition name="fade">
-            <CharacterDetail 
-                v-if="showDetail" 
+    
+    <transition name="fade">
+    <PopUp 
+        v-if="isOpen"
+        :phraseID="phraseID"
+        @closePopUp="closePopUp"/>
+    </transition>
+    
+    <div v-bind:class="[isOpen ? blurClass : '', bkClass]">
+        <div class="selection-div">
+            <CharacterList 
                 :imageUrl="imageUrl" 
-                :characterID="characterID"
-                @closeDetail="closeDetail"
-                @characterIsSelected="characterIsSelected"/>
-        </transition>
+                @setCharacterID="setCharacterID"/>
+
+            <transition name="fade">
+                <CharacterDetail 
+                    v-if="showDetail" 
+                    :imageUrl="imageUrl" 
+                    :characterID="characterID"
+                    @closeDetail="closeDetail"
+                    @characterIsSelected="characterIsSelected"/>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -23,19 +33,25 @@ import { mapState, mapMutations } from 'vuex';
 import { STAGES as stages_constants } from '@/consts.js';
 import CharacterList from '@/components/CharacterList.vue';
 import CharacterDetail from '@/components/CharacterDetail.vue';
+import PopUp from '@/components/PopUp.vue';
 
 export default {
     name: 'CharacterSelection',
     components: {
         CharacterList,
-        CharacterDetail
+        CharacterDetail,
+        PopUp
     },
     emits: ['characterIsSelected'], //lo que esta emitiiendo a otros componentes
     data() {
         return {
             imageUrl: 'something',
             characterID: '',
-            showDetail: false
+            showDetail: false,
+            bkClass: 'bk',
+            blurClass: 'blur',
+            isOpen: false,  //Para mostrar o no el pop up
+            phraseID: 1     //Frase que ha de aparecer en el pop up
         }
     },
     computed: {
@@ -52,17 +68,32 @@ export default {
         },
         characterIsSelected() {
             this.$emit('characterIsSelected', this.characterID);
+        },
+        closePopUp() {
+            this.isOpen = false;
         }
-
+    },
+    mounted() {
+      this.isOpen = true;
     }
 }
 </script>
 
 <style scoped>
+.bk {
+  transition: all 0.5s ease-out;
+}
+
+.blur {
+  filter: grayscale(100) blur(2px);
+  /*Desactivar botones y cualquier interaccion posible*/
+  pointer-events: none;
+}
+
 .selection-div {
     padding: 10px;
     background-color: red;
-    height: 100%;
+    height: 100vh;
 
     display: flex;
     justify-content: center;

@@ -7,6 +7,7 @@ export class Particle {
         this.direction_x = Math.random() * 1 - 0.5; //-0.5  a  0.5
         this.direction_y = Math.random() * 1 - 0.5; //-0.5  a  0.5
         //this.color = 'hsl(' + hue + ',100%, 50%, 0.8)';
+        this.style = null;
     }
 
     update(gamespeed = 1) {
@@ -20,8 +21,12 @@ export class Particle {
         }
     }
 
-    draw(ctx) {
-        ctx.fillStyle = 'rgba(0, 0, 0,' + this.opacity + ')';
+    getStyle() {
+        return 'rgba(0, 0, 0,' + this.opacity + ')';
+    }
+
+    draw( ctx ) {
+        ctx.fillStyle = this.style == null ? this.getStyle() : this.style;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
         ctx.fill();

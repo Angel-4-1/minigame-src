@@ -4,7 +4,7 @@
         <div class="detail-view" v-if="show">
 
             <div v-if="character" class="image">
-                <img :src="require(`@/${character.icon}`)" width="96" height="96" alt="Image Not Found">
+                <img class="myimage" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Image Not Found">
             </div>
 
             <!-- Informacion sobre cada personaje -->
@@ -98,7 +98,7 @@ h3 {
     justify-content: center;
     align-items: flex-start;
     /*flex-direction: column;*/
-    position: fixed;
+    position: absolute;
     top: 0;
     left: -10px;
     padding: 90px 10px 10px;
@@ -115,10 +115,12 @@ h3 {
     flex-direction: column;
     position: relative;
     width: 100%;
-    max-width: 510px;
-    padding: 50px 0 0;
+    height: 70vh;
+    max-width: 600px;
+    max-height: 650px;
     background-color: #ffffff;
     border-radius: 10px;
+    margin: 5%;
 }
 
 /*IMAGEN*/
@@ -133,6 +135,10 @@ h3 {
     background-color: #333;
     border-radius: 50%;
     overflow: hidden;
+}
+
+.myimage {
+    border-radius: 50%;
 }
 
 /*DESCRIPCION DEL PERSONAJE*/

@@ -62,6 +62,7 @@ export function initObstacles(_sprite, obstacles_array, spawn_points) {
         var random = Math.floor(Math.random() * spawn_points.total);
         var x = 0;
 
+        //Seleccionar un punto aleatorio de aparicion
         if ( random >= 0 && random < spawn_points.total ) {
             x = spawn_points.points[random];
         } else {

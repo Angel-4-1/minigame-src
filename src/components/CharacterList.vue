@@ -9,7 +9,7 @@ Mostrar una lista con los distintos personajes disponibles
             <!--
                 <img :src="imageUrl + character.id + '.png'" width="96" height="96" alt="Image Not Found">
             -->
-            <img :src="require(`@/${character.icon}`)" width="96" height="96" alt="Character Icon Not Found">
+            <img class="image" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Character Icon Not Found">
             <h3>{{ character.name }}</h3>
         </article>
     </div>
@@ -79,6 +79,11 @@ h3 {
 
 h1 {
     color: #ffffff;
+}
+
+.image {
+    border-radius: 50%;
+    margin-top: 6%;
 }
 
 </style>

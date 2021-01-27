@@ -2,13 +2,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
 
-<!-- <button class="btn-modal-open" @click="toggleModal">Open</button> -->
 <transition name="fade">
-  <span v-if="isOpen" class="modal">
-    <h1 class="title">WELCOME!</h1>
-    <p>It's time to start playing, but before you must choose a level</p>
-    <button class="btn-modal-close" @click="toggleModal">Close</button>
-  </span>
+  <PopUp 
+    v-if="isOpen"
+    :phraseID="phraseID"
+    @closePopUp="closePopUp"/>
 </transition>
 
 <div v-bind:class="[isOpen ? blurClass : '', bkClass]">
@@ -25,10 +23,10 @@
           <div v-if="level.isActive" class="level-container">
             <!-- Siguiente nivel a la derecha -->
             <div v-if="index >= 0 && (index+1) < levels.length" class="card card-right">
-              <img class="card-image" :src="require(`@/${levels[index+1].adress}`)" >
+              <img class="card-image" :src="require(`@/${levels[index+1].icon}`)" >
               <div class="card-content">
                 <!-- <h1 class="numbertext numbertext-right">{{ levels[index+1].id + 1 }} / {{ levels.length }}</h1> -->
-                <h1 class="card-header">{{ level.name }}</h1>
+                <h1 class="card-header">{{ levels[index+1].name }}</h1>
                 <p class="card-text card-text-no-overflow">{{ levels[index+1].description }}</p>
               </div>
             </div>
@@ -36,10 +34,10 @@
 
             <!-- Nivel anterior a la izquierda -->
             <div v-if="index < levels.length && (index-1) >= 0" class="card card-left">
-              <img class="card-image" :src="require(`@/${levels[index-1].adress}`)" > <!--style="width:100%"-->
+              <img class="card-image" :src="require(`@/${levels[index-1].icon}`)" > <!--style="width:100%"-->
               <div class="card-content">
                 <!-- <h1 class="card-header">{{ levels[index-1].id + 1 }} / {{ levels.length }}</h1> -->
-                <h1 class="card-header">{{ level.name }}</h1>
+                <h1 class="card-header">{{ levels[index-1].name }}</h1>
                 <p class="card-text card-text-no-overflow">{{ levels[index-1].description }}</p>
               </div>
             </div>
@@ -47,7 +45,7 @@
 
             <!-- Nivel actual en el centro -->
             <div class="card">
-              <img class="card-image" :src="require(`@/${level.adress}`)" alt="Level image">
+              <img class="card-image" :src="require(`@/${level.icon}`)" alt="Level image">
               <div class="card-content">
                 <!-- <h1 class="ca">{{ level.id + 1 }} / {{ levels.length }}</div> -->
                 <h1 class="card-header">{{ level.name }}</h1>
@@ -82,16 +80,18 @@
     </div>
 
     </div>
-  </div>
+</div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants, LEVELS } from '@/consts.js';
+import { STAGES as stages_constants, LEVELS, INSTRUCTOR } from '@/consts.js';
+import PopUp from '@/components/PopUp.vue';
 
 export default {
     name: 'LevelSelection',
     components: {
+      PopUp
     },
     emits: ['levelIsSelected'], //lo que esta emitiendo a otros componentes
     data() {
@@ -102,7 +102,8 @@ export default {
         current_level: 0,
         levels: LEVELS,
         bkClass: 'bk',
-        blurClass: 'blur'
+        blurClass: 'blur',
+        phraseID: 0
       }
     },
     computed: {
@@ -113,10 +114,10 @@ export default {
         this.isOpen = !this.isOpen;
       },
       setLevelID(id) {
-          this.levelID = id;
+        this.levelID = id;
       },
       levelIsSelected(id) {
-          this.$emit('levelIsSelected', id);
+        this.$emit('levelIsSelected', id);
       },
       showNextLevel(n, index) {
         //comprobar que estemos dentro del rango de niveles
@@ -135,6 +136,9 @@ export default {
           this.levels[i].isActive = false;
         }
         this.levels[this.current_level].isActive = true;
+      },
+      closePopUp() {
+        this.toggleModal();
       }
     },
     mounted() {
@@ -187,78 +191,6 @@ export default {
   align-items: center;
   flex-direction: column;
   background: radial-gradient(#ddd121, #867215);
-}
-
-.modal {
-  position: absolute;
-  height: 40%;
-  width: 80%;
-  background: white;
-  border-radius: 10px;
-  left: 50%;
-  top: 30%;
-  z-index: 1;
-  transform: translate(-50%, -50%);
-  /*Centrar sus elementos*/
-  display:flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
-  max-width: 700px;
-}
-
-.btn-modal-open {
-  position: absolute;
-  left: 75%;
-  top: 5%;
-  transform: translate(-50%, -50%);
-}
-
-.btn-modal-close {
-  /*position: relative;*/
-  height: 20%;
-  width: 100%;
-  background: rgb(0, 162, 255);
-  border-radius: 10px;
-  margin: 0;
-  font-size:calc(11px + 1vw);
-  text-align: center;
-  color: #3363ff;
-  background-color: #d8e0fd;
-  border: none;
-  outline: none;
-  text-decoration: none;
-  transition: 0.2s;
-  letter-spacing: 0.1rem;
-  cursor: pointer;
-}
-
-.btn-modal-close:hover, .btn-modal-close:active {
-  background-color: #9baceb;
-}
-
-.modal .title {
-  /*position: relative;*/
-  font-size:calc(12px + 1.5vw);
-  padding: 0;
-  margin: 0;
-  height: 30%;
-  width: 100%;
-  background: rgb(175, 171, 116);
-  border-radius: 10px;
-}
-
-.modal p {
-  /*position: relative;*/
-  font-size:calc(5px + 1.5vw);
-  padding: 0;
-  margin: 1%;
-  color: #000000; 
-  height: 50%;
-  width: 100%;
-  background: rgb(229, 210, 155);
-  border-radius: 10px;
 }
 
 h1 {

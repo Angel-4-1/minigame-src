@@ -1,8 +1,8 @@
 export class Gamemap {
-    constructor(_tileset, _canvas) {
+    constructor(_tileset, _map, _canvas) {
         this.tile_width  = 100;             //dimensiones en pixeles de cada tile
         this.tile_height = 100; 
-        this.map = [1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 8, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 3, 3, 4, 3, 3, 4, 3, 3, 8];
+        this.map = _map;
         this.map_width  = 10;               //de cuantos tiles se compone en mapa
         this.map_height = 10;
         this.y = 0;
