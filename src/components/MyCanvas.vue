@@ -1,15 +1,7 @@
 <template>
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
-
-    <img id="sprite" ref="sprite" :src="require(`@/${character.sprite}`)" style="display:none;" alt="Sprite Character">
-    <img id="numbers" ref="numbers" :src="require(`@/assets/hola.png`)" style="display:none;" alt="Sprite Numbers">
-    <img id="buttons" ref="buttons" :src="require(`@/assets/button.png`)" style="display:none;" alt="Buttons">
-    <img id="reset" ref="reset" :src="require(`@/assets/reset.png`)" style="display:none;" alt="Reset button">
-    <img id="background" ref="background" :src="require(`@/assets/BG.png`)" style="display:none;" alt="Background">
-    <img id="collision" ref="collision" :src="require(`@/assets/collision.png`)" style="display:none;" alt="Collision">
-    <img id="tileset" ref="tileset" :src="require(`@/${level.tileset}`)" style="display:none;" alt="Tileset">
-    <img id="obstacles" ref="obstacles" :src="require(`@/assets/obstacles.png`)" style="display:none;" alt="Obstacles">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <canvas id="canvas"></canvas>
     
@@ -17,7 +9,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES, CHARACTERS, LEVELS } from '@/consts.js';
+import { STAGES, CHARACTERS, LEVELS, MAPS } from '@/consts.js';
 import * as PLAYER from '../game/player.js';
 import * as BUTTON from '../game/button.js';
 import * as BACKGROUND from '../game/background.js';
@@ -26,10 +18,11 @@ import * as UTILS from '../game/utils.js';
 import * as GAMEMAP from '../game/gamemap.js';
 import * as PARTICLE from '../game/particles.js';
 import * as SNOW from '../game/snow.js';
+import * as FLOATINGMESSAGE from '../game/floatingMessage.js';
 
 export default {
     name: 'MyCanvas',
-    emits: [ 'openPauseMenu' ],
+    emits: [ 'openPauseMenu', 'openQuiz', 'gameOver' ],
     components: {
     },
     props: [
@@ -58,7 +51,14 @@ export default {
             obstacles: [],
 
             /**NIVEL**/
-            level: LEVELS[ this.$props['levelID'] ],
+            //level: LEVELS[ this.$props['levelID'] ],
+            //tileset: LEVELS[ this.$props['levelID'] ].tileset,
+            tileset_snow: false,
+
+            /**MAPA */
+            maps: null,
+            tileset: null,
+            current_map: null,
 
             /**PARTICULAS**/
             snow: null,
@@ -72,7 +72,7 @@ export default {
 
             /**OTRAS VARIABLES**/
             globalID_animation: 0,  //controlar el animation frame request
-            gamespeed: 2,
+            gamespeed: 4,
             start: undefined,       //tiempo de inicio
             active_time: 0,         //tiempo que el juego lleva activo
             mouseIsDown: false,     //si el boton del raton esta siendo pulsado
@@ -87,11 +87,21 @@ export default {
             score: 0,
             collisions: 0,
             collision_image: null,
+            last: 0,                //timestamp frame anterior
+            color_header: "rgba(250, 200, 200, 1)",
+            ability_button: null,
+            image_container: {},
+            images_preload: 7,
+            images_current: 0,
+            finish: null,
 
             /**TILEMAP**/
             game_map: null,
             current_sec: 0,
-            frameLastSecond: 0
+            frameLastSecond: 0,
+
+            /**FLOATING MESSAGES**/
+            floatingMessages: []
         }
     },
     methods: {
@@ -132,6 +142,16 @@ export default {
             this.status = true;
             document.dispatchEvent(this.play_event);
         },
+        gameOver() {
+            console.log( "GAME OVER" );
+            this.status = false;
+            document.dispatchEvent(this.pause_event);
+            //this.cancelAnimation();
+            //this.pauseGame();
+            //cancelAnimationFrame(this.globalID_animation);
+            var msg = { score: this.score, character: this.$props['characterID'], level: this.$props['levelID'], time: this.active_time };
+            this.$emit( 'gameOver', JSON.stringify( msg ) );       
+        },
         //Cuando se ha pulsado el raton o tocado la pantalla
         mousedown(e) {
             let mouse_position = [];
@@ -147,7 +167,7 @@ export default {
             let x = mouse_position[0];
             let y = mouse_position[1];
 
-            if ( y < 100 ) {    //estamos en el header
+            if ( y < 220 ) {    //estamos en el header
                 if ( this.pause_button.isHit(x,y) ) {
                     if ( this.status ) {    //estamos en modo Play
                         this.pauseGame();           
@@ -155,7 +175,34 @@ export default {
                         this.continueGame();
                     }
                 } else if ( this.reset_button.isHit(x,y) ) {
-                    this.resetGame();
+                    //this.resetGame();
+                    //SOLO DE PRUEBA --> llama al quiz
+                    this.status = false;
+                    document.dispatchEvent(this.pause_event);
+                    this.$emit('openQuiz');
+                    
+                } else if ( this.character.has_ability ) {
+                    if ( this.ability_button.isHit(x,y) ) {
+                        if (this.tileset_snow) { 
+                            this.changeTileset( MAPS[ this.maps[0] ].tileset );
+                            this.tileset_snow = false;
+                            this.gamespeed = 4;
+                            this.isSnowing = false;
+                            this.player.changeParticleColor( "rgba(0,0,0,");
+                            this.color_header = "rgba(250, 200, 200, 1)";
+                            this.ability_button.active = false;
+                        } else {
+                            this.changeTileset( MAPS[ this.maps[1] ].tileset );
+                            this.tileset_snow = true;
+                            this.gamespeed = 2;
+                            this.isSnowing = true;
+                            this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
+                            this.snow.createSnowParticles();
+                            this.player.changeParticleColor( "rgba(255,255,255,");
+                            this.color_header = "rgba(150, 220, 240, 1)";
+                            this.ability_button.active = true;
+                        }
+                    }
                 }
                 return;
             }
@@ -219,21 +266,21 @@ export default {
         },
         handleScore() {
             //Texto
-            this.context.font = "60px Carter One";
+            this.context.font = "60px Press Start 2P";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
             this.context.fillText("S: " + this.score, 400, 70);
             this.context.fillText("C: " + this.collisions, 600, 70);
         },
         //Se llama en cada ciclo del juego
-        update(timestamp) {
+        update( elapsed_time ) {
             //Player
-            this.player.update(timestamp, this.gamespeed, this.frames_done);
+            this.player.update( elapsed_time, this.gamespeed, this.frames_done );
 
-            if (this.mouseIsDown) {
-                this.player.moveOnMouseDown();
+            if ( this.mouseIsDown ) {
+                this.player.moveOnMouseDown( elapsed_time, this.gamespeed );
             }
 
-            var obs_score = OBSTACLE.handleObstacles(this.obstacles, this.context, this.canvas, this.gamespeed, this.score);
+            var obs_score = OBSTACLE.handleObstacles(this.obstacles, this.context, this.canvas, this.gamespeed, this.score, elapsed_time);
             this.obstacles = obs_score[0];
             this.score = obs_score[1];
 
@@ -242,29 +289,52 @@ export default {
 
             //snow
             if ( this.isSnowing ) { this.snow.update(); }
+
+            //buttons
+            for (let i = 0; i < this.buttons.length; i++) {
+                if( this.buttons[i].is_animated ) {
+                    this.buttons[i].update();
+                }
+            }
         },
         handleCollisions() {
             for (let i = 0; i < this.obstacles.length; i++ ) {
                 if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.obstacles[i].x, this.obstacles[i].y, this.obstacles[i].width, this.obstacles[i].height, true ) && this.obstacles[i].isHit == false ) {
                     this.collisions++;
                     this.obstacles[i].isHit = true;
-                    //UTILS.drawImageAtPoint(this.context, this.collision_image, this.player.pos.x, this.player.pos.y, 100, 100);
+                    this.floatingMessages.push( 
+                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "COLLISION", 20, 3 )
+                    );
+                    var alive = this.player.updateLive();
+                    if ( !alive ) { //game over
+                        this.gameOver();
+                    }
                 }
             }
         },
         render(timestamp) {
+            //Computar segundos que han pasado desde la iteracion anterior
+            var now = performance.now();
+            //Diferencia entre frames en segundos
+            var elapsed_time = ( now - this.last ) / 1000;
+            this.last = now;
+
             //Resetear todo lo dibujado anteriormente
-            this.resetCanvas();           
+            this.resetCanvas( elapsed_time );
 
             //Actualizar datos
-            this.update(timestamp);
+            this.update( elapsed_time );
 
             //Player
             this.player.draw(this.context);
 
             //Snow
-            if ( this.isSnowing ) { this.snow.draw( this.context ); }
-            
+            if ( this.isSnowing ) { 
+                this.snow.draw( this.context );
+                this.context.fillStyle = "rgba(0, 204, 204, 0.2)";
+                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
             //Encabezado
             this.drawHeader();
 
@@ -276,20 +346,25 @@ export default {
             //Puntos
             this.handleScore();
 
+            //floating messages
+            this.handleFloatingMessages();
+
             //FPS
             this.drawFPS();
 
             this.display.drawImage(this.context.canvas, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.display.canvas.width, this.display.canvas.height);
 
             //Loop infinito
-            this.globalID_animation = window.requestAnimationFrame(this.render);
+            if ( this.status ) {
+                this.globalID_animation = window.requestAnimationFrame(this.render);
+            }
         },
         drawHeader() {
             //Encabezado
-            this.context.fillStyle = "rgba(250, 200, 200, 1)";
+            this.context.fillStyle = this.color_header;
             this.context.fillRect(0, 0, this.context.canvas.width, 100);
             //Texto
-            this.context.font = "60px Carter One";
+            this.context.font = "40px 'Press Start 2P'";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
             this.context.fillText("Time: " + this.active_time, 20, 70);
         },
@@ -303,17 +378,25 @@ export default {
                 this.frames_done++;
             }
 
-            this.context.font = "60px Carter One";
+            this.context.font = "40px 'Press Start 2P'";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
             this.context.fillText("FPS: " + this.frameLastSecond, 15, 200);
         },
-        resetCanvas() {
+        changeTileset( new_tileset ) {
+            try {
+                var tileset_img = this.getImage( require(`@/${new_tileset}`) );
+                this.game_map.tileset = tileset_img;
+            } catch(e) {
+                console.error(new_tileset +" Not found");
+            }
+        },
+        resetCanvas( elapsed_time ) {
             //Resetar canvas
             this.context.fillStyle = "rgba(255, 255, 255, 1)";
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
             //Fondo
             //this.background.handleBackground(this.gamespeed, this.context);
-            this.game_map.drawMap(this.gamespeed, this.context);     
+            this.game_map.drawMap(this.gamespeed, this.context, elapsed_time);     
         },
         resetGame() {
             if ( this.status == false ) { this.continueGame(); }
@@ -335,9 +418,49 @@ export default {
 
             this.display.canvas.width = this.display.canvas.height * 0.9;
             this.display.imageSmoothingEnabled = false;
+        },
+        handleFloatingMessages() {
+            for ( var i = 0; i < this.floatingMessages.length; i++) {
+                this.floatingMessages[i].update();
+                this.floatingMessages[i].draw( this.context );
+                /*this.floatingMessages[e].lifeSpan <= .01 && (floatingMessages.splice(e, 1),
+                    e--)*/
+                if ( this.floatingMessages[i].life < 0.2 ) {
+                    this.floatingMessages.splice(i, 1);
+                }
+            }
+        },
+        //Image manager
+        getImage(url) {
+            //Si la imagen ya ha sido cargado
+            if( this.image_container[url] ) {
+                return this.image_container[url];
+            }
+
+            //Sino, cargala y guardala
+            var img = this.image_container[url] = new Image();
+            img.src = url;
+            return img;
+        },
+        checkAllLoaded() {
+            if ( this.images_current = this.images_preload ) {
+                console.log("FINISHED " + this.images_current + "/" + this.images_preload);
+                return true;
+            }
+            return false;
+        },
+        //Pantalla que muestra el texto Loading
+        loadingScreen() {
+            this.context.fillStyle = "rgba(255, 255, 255, 1)";
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.context.font = "40px 'Press Start 2P'";
+            this.context.fillStyle = "rgba(0, 0, 0, 1)";
+            this.context.fillText("LOADING ...", 300, 500);
+            this.display.drawImage(this.context.canvas, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.display.canvas.width, this.display.canvas.height);
         }
     },
     mounted() {
+        this.status = true;
         /**INSTANCIAR VARIABLES INICIALES**/
         this.canvas  = document.createElement("canvas");
         this.context = this.canvas.getContext('2d');
@@ -349,32 +472,90 @@ export default {
         //Redimensionar para ajustar tamaño
         this.onResize();
 
+        //Mostrar texxt Loading
+        this.loadingScreen();
+        
+        var that = this;
+
         /**CREAR AL PLAYER**/
-        this.player = new PLAYER.Player(this.$refs.sprite, this.character.animation, this.character.frames, this.character.sprite_size_x, this.character.sprite_size_y );
-        //Set de animaciones inicial
-        this.player.setAnimation(this.player.BACK);
-        //Offset del player
-        this.player.offset = { x: -this.player.SPRITE_SIZE_X/2 , y: -this.player.SPRITE_SIZE_Y/2 };
+        var player_img = this.getImage( require(`@/${this.character.sprite}`) );
+        player_img.addEventListener("load", function(event) {// When the load event fires, do this:
+            that.player = new PLAYER.Player(player_img, that.character.animation, that.character.frames, that.character.sprite_size_x, that.character.sprite_size_y );
+            //Set de animaciones inicial
+            that.player.setAnimation(that.player.BACK);
+            //Offset del player
+            that.player.offset = { x: -that.player.SPRITE_SIZE_X/2 , y: -that.player.SPRITE_SIZE_Y/2 };
+            console.log("PLAYER LOADED");
+            that.images_current++;
+        });
+        
 
         /**BOTONES**/
-        this.pause_button = new BUTTON.Button(this.$refs.buttons, 900, 10, 80, 80, 128, false);
-        this.reset_button = new BUTTON.Button(this.$refs.reset, 800, 10, 80, 80, 128, false);
-        this.buttons.push(this.pause_button, this.reset_button);
+        var pause_img = this.getImage( require(`@/assets/button.png`) );
+        var reset_img = this.getImage( require(`@/assets/reset.png`) );
+        
+        pause_img.addEventListener("load", function(event) { 
+            that.pause_button = new BUTTON.Button(pause_img, 900, 10, 80, 80, 128, false, 2, false); 
+            that.buttons.push(that.pause_button);
+            console.log("PAUSE LOADED");
+            that.images_current++;
+        });
+        reset_img.addEventListener("load", function(event) { 
+            that.reset_button = new BUTTON.Button(reset_img, 800, 10, 80, 80, 128, false, 2, false);
+            that.buttons.push(that.reset_button);
+            console.log("RESET LOADED");
+            that.images_current++;
+        });
+
+        /**HABILIDAD**/
+        if ( this.character.has_ability ) {
+            var ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+            ability_img.addEventListener("load", function(event) { 
+                that.ability_button = new BUTTON.Button(ability_img, 880, 110, 100, 100, 125, false, 31, true);
+                that.buttons.push(that.ability_button);
+                console.log("ABILITY LOADED");
+                that.images_current++;
+            });
+        } else {
+            this.images_preload--;
+        }
+        
+        //this.buttons.push(this.pause_button, this.reset_button, this.ability_button);
 
         /**FONDO DEL JUEGO**/
-        this.background = new BACKGROUND.Background(this.$refs.background, this.canvas);
+        var bg_img = this.getImage( require(`@/assets/BG.png`) );
+        bg_img.addEventListener("load", function(event) { 
+            that.background = new BACKGROUND.Background(bg_img, that.canvas);
+            console.log("BG LOADED");
+            that.images_current++;
+        });
+        
 
         /**OBSTACULOS**/
-        this.obstacles = OBSTACLE.initObstacles(this.$refs.obstacles, this.obstacles, this.spawn_points);
-
+        var obs_img = this.getImage( require(`@/assets/obstacles.png`) );
+        obs_img.addEventListener("load", function(event) { 
+            that.obstacles = OBSTACLE.initObstacles(obs_img, that.obstacles, that.spawn_points);
+            console.log("OBSTACLES LOADED");
+            that.images_current++;
+        });
+        
         /**COLLISION**/
-        this.collision_image = this.$refs.collision;
+        //this.collision_image = this.$refs.collision;
 
         /**MAPA**/
-        this.game_map = new GAMEMAP.Gamemap(this.$refs.tileset, this.level.map, this.canvas);
+        this.maps = this.character.map;
+        this.current_map = MAPS[ this.maps[0] ].map;
+        this.tileset = MAPS[ this.maps[0] ].tileset;
+        
+        var tileset_img = this.getImage( require(`@/${this.tileset}`) );
+        tileset_img.addEventListener("load", function(event) { 
+            that.game_map = new GAMEMAP.Gamemap(tileset_img, that.current_map, that.canvas);
+            console.log("TILESET LOADED");
+            that.images_current++;
+        });
 
         /**SNOW**/
-        this.isSnowing = this.level.id == 1 ? true : false;
+        this.isSnowing = this.current_map == 1 ? true : false;
         if ( this.isSnowing ) { 
             this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
             this.snow.createSnowParticles();
@@ -391,7 +572,7 @@ export default {
         //Resize
         window.addEventListener('resize', this.onResize);
         //Touch events
-        this.display_canvas.addEventListener('touchstart', this.mousedown);
+        this.display_canvas.addEventListener('touchstart', this.mousedown, {passive: true});
         this.display_canvas.addEventListener('touchend', this.mouseup);
         //Pause events
         this.pause_event = new Event('pause');
@@ -408,9 +589,16 @@ export default {
         }, 1000); // update about every second
 
         /**INICIAR LOOP JUEGO**/
-        this.globalID_animation = window.requestAnimationFrame(this.render);
+        this.last = performance.now();
+        this.finish = setInterval( function () {
+            if( that.checkAllLoaded() ) {
+                that.globalID_animation = window.requestAnimationFrame(that.render);
+                clearInterval(that.finish);
+            }
+        }, 1000);
+
     },
-    beforeUnmount() {
+    unmount() {
         //Eliminar todos los eventos creados
         this.display_canvas.removeEventListener('mousedown', this.mousedown);
         this.display_canvas.removeEventListener('mousemove', this.mousemove);
@@ -422,6 +610,7 @@ export default {
         this.display_canvas.removeEventListener('touchend', this.touchend);
         document.removeEventListener('pause', this.cancelAnimation);
         document.removeEventListener('play', this.startAnimation);
+        this.status = false;
     }
 
 }
@@ -443,5 +632,6 @@ canvas {
     margin-top: 1%;
     /*No interpolacion*/
     image-rendering: pixelated;
+    font-family: "Press Start 2P";
 }
 </style>

@@ -42,7 +42,8 @@ export default {
             characterIsNotSelected: true,
             levelIsNotSelected: true,
             levelID: 0,
-            characterID: 0
+            characterID: 0,
+            score: 0
         }
     },
     computed: {
@@ -63,8 +64,8 @@ export default {
         isThereACharacter() {
             return ( this.characterIsNotSelected == true && this.levelIsNotSelected == false );
         },
-        gameIsOver() {
-            this.changeState(this.destination);
+        gameIsOver( data ) {
+            this.$emit('gameIsOver', data );
         }, 
         canStartTheGame() {
             return ( this.characterIsNotSelected == false && this.levelIsNotSelected == false );
@@ -72,6 +73,10 @@ export default {
     },
     //al acceder por primera vez
     created() {
+        this.characterIsNotSelected = true;
+        this.levelIsNotSelected = true;
+    },
+    mounted() {
         this.characterIsNotSelected = true;
         this.levelIsNotSelected = true;
     }

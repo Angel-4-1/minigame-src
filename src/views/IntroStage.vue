@@ -5,7 +5,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <div class="introstage-div">
-        <h1>Intro Stage</h1>
+        <h1>Defend your</h1>
+        <h1>privacy</h1>
         <button class="btn-start blinking" @click="changeState(destination)">START</button>
     </div>
 </template>

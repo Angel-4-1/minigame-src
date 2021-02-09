@@ -1,5 +1,6 @@
 import * as PARTICLE from '../game/particles.js';
 import * as UTILS from '../game/utils.js';
+import * as ABILITY from '../game/ability.js';
 
 export class Player {
     constructor(_sprite, _animation, _frames, _SPRITE_SIZE_X, _SPRITE_SIZE_Y) {
@@ -10,7 +11,7 @@ export class Player {
         this.animation_set = [];            //animacion que esta siendo utilizada  []
         this.frames = _frames;                    //de cuantos frames se compone cada set de animaciones
         this.current_frame = 0;             //frame en el que estamos
-        this.speed = 20;                    //velocidad a la que se mueve
+        this.speed = 500;                    //velocidad a la que se mueve
         this.pos = { x: 500, y: 855 };      //posicion
         this.target_pos = { x: 0, y: 0 };   //posicion objetivo
         this.offset = {x: 0, y: 0};         //donde se guarda la posicion central del sprite
@@ -24,9 +25,26 @@ export class Player {
         this.max_particles = 100;
         this.isMoving = false;
         this.canMove = true;
+        this.frames_done = 0;
+        this.speed_frames = 10;
+        this.ability = new ABILITY.Ability();
+        this.has_ability = true;
+        this.particle_color = 'rgba(0, 0, 0,';
+        this.lives =  1;
     }
 
     update(timestamp, gamespeed, frames_done) {
+        this.frames_done++;
+
+        if ( this.frames_done > this.speed_frames ) {
+            this.frames_done = 0;
+            this.current_frame++;
+
+            if ( this.current_frame >= this.frames ) {
+                this.current_frame = 0;
+            }
+        }
+        /*
         if ( this.start === undefined ) {
             this.start = timestamp;
         }
@@ -52,7 +70,7 @@ export class Player {
     }
 
     //direction --> true = hacia la derecha  |  false = hacia la izquierda
-    move(direction) {
+    move( direction ) {
         if(!this.canMove) return;
 
         let target_x;
@@ -69,15 +87,15 @@ export class Player {
         this.isMoving = true;
     }
 
-    moveOnMouseDown() {
+    moveOnMouseDown( elapsed_time, gamespeed ) {
         if(!this.canMove) return;
 
         if ( this.target_pos.x - (this.SPRITE_SIZE_X / 4) < this.pos.x + this.offset.x ) {
-            var target_x = this.pos.x - 0.25 * this.speed;
+            var target_x = this.pos.x - 0.25 * this.speed * elapsed_time * gamespeed;
             this.isMoving = true;
             if( this.isValidPosition(target_x) ) { this.pos.x = target_x; }
         } else if ( this.target_pos.x - (this.SPRITE_SIZE_X / 2) > this.pos.x + this.offset.x ) {
-            var target_x = this.pos.x + 0.25 * this.speed;
+            var target_x = this.pos.x + 0.25 * this.speed * elapsed_time * gamespeed;
             this.isMoving = true;
             if( this.isValidPosition(target_x) ) { this.pos.x = target_x; }
         } else {
@@ -106,6 +124,11 @@ export class Player {
         ctx.drawImage(this.sprite, this.animation_set[this.current_frame].x * this.SPRITE_SIZE_X, this.animation_set[this.current_frame].y * this.SPRITE_SIZE_Y, this.SPRITE_SIZE_X, this.SPRITE_SIZE_Y, Math.floor(this.pos.x + this.offset.x), Math.floor(this.pos.y + this.offset.y), this.SPRITE_SIZE_X, this.SPRITE_SIZE_Y);
 
         this.handleParticle(ctx);
+
+        /*
+        if ( this.has_ability ) {
+            this.ability.draw( ctx );
+        }*/
     }
 
     drawHitVersion( ctx ) {
@@ -137,7 +160,7 @@ export class Player {
 
     
     handleParticle(ctx) {
-        if (this.isMoving) this.particles_array.unshift(new PARTICLE.Particle(this.pos.x, this.pos.y + this.SPRITE_SIZE_Y/3));
+        if (this.isMoving) this.particles_array.unshift(new PARTICLE.Particle(this.pos.x, this.pos.y + this.SPRITE_SIZE_Y/3, this.particle_color));
 
         for (let i = 0; i < this.particles_array.length; i++ ) {
             this.particles_array[i].update();
@@ -150,5 +173,18 @@ export class Player {
                 this.particles_array.pop(this.particles_array[i]);
             }
         }
+    }
+
+    changeParticleColor( color ) {
+        this.particle_color = color;
+    }
+
+    updateLive( ) {
+        this.lives--;
+        if ( this.lives < 0 ) {
+            return false;
+        }
+
+        return true;
     }
 }

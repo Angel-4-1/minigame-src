@@ -1,6 +1,7 @@
 <template>
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <transition name="fade">
   <PopUp 
@@ -51,7 +52,7 @@
                 <h1 class="card-header">{{ level.name }}</h1>
                 <p class="card-text">{{ level.description }}</p>
               </div>
-              <button class="card-btn" @click="levelIsSelected(current_level)">SELECT <span>&rarr;</span></button>
+              <button class="card-btn" @click="levelIsSelected(current_level)">SELECT</button>
             </div>
             
             
@@ -152,7 +153,7 @@ export default {
 
 <style scoped>
 * {
-  font-family: 'Carter One', arial;
+  font-family: 'Press Start 2P', 'Carter One', arial;
   font-size: 1rem;
   font-weight: normal;
 }
@@ -269,14 +270,14 @@ h1 {
 }
 
 .card-header {
-  font-size:calc(11px + 1.5vw);
+  font-size:calc(11px + 0.8vw);
   font-weight: 500;
   color: #000;
   max-height: 5vh;
 }
 
 .card-text {
-  font-size:calc(10px + .75vw);
+  font-size:calc(10px + .4vw);
   letter-spacing: 0.1rem;
   line-height: 1.7;
   color: #3d3d3d;

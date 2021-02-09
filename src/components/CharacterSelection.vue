@@ -2,6 +2,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <!-- <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet"> -->
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <transition name="fade">
     <PopUp 
@@ -102,8 +103,7 @@ export default {
     /*width: calc(100% - 20px);*/
     /*min-height: calc(100vh - 20px);*/
     background: radial-gradient(#156F99, #0A2E50);
-    font-family: 'Carter One', arial;
-    font-size: 1rem;
+    font-family: 'Press Start 2P', 'Carter One', arial;
     font-weight: normal;
 }
 

@@ -7,8 +7,14 @@
         <div v-if="current_stage.id == my_stages.STAGE"><Stage/></div>
         <div v-if="current_stage.id == my_stages.INTRO_STAGE"><IntroStage/></div>
         <div v-if="current_stage.id == my_stages.TUTORIAL_STAGE"><TutorialStage/></div>
-        <div v-if="current_stage.id == my_stages.PLAY_STAGE"><PlayStage/></div>
-        <div v-if="current_stage.id == my_stages.FINAL_STAGE"><FinalStage/></div>
+        <div v-if="current_stage.id == my_stages.PLAY_STAGE">
+            <PlayStage
+                @gameIsOver="gameIsOver"/>
+        </div>
+        <div v-if="current_stage.id == my_stages.FINAL_STAGE">
+            <FinalStage
+                :score_obtained="score_obtained"/>
+        </div>
 
         <h1> ID: {{ current_stage.id }} Name: {{ current_stage.name }}</h1>
         <button @click="changeState( true )">Next Stage</button>
@@ -38,7 +44,8 @@ export default {
     data() {
         return {
             change_state: false,
-            my_stages: stages_constants //copiar los STAGES en variable local
+            my_stages: stages_constants, //copiar los STAGES en variable local
+            score_obtained: null
         }
     },
     computed: {
@@ -80,6 +87,10 @@ export default {
             }
 
             return 'NotFound';
+        },
+        gameIsOver( data ) {
+            this.score_obtained = data;
+            this.changeState(this.my_stages.FINAL_STAGE);
         }
     }
 }

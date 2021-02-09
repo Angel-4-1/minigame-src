@@ -12,7 +12,8 @@ export class Gamemap {
         this.tileset = _tileset;            //sprite con los dibujos de cada celda
     }
 
-    drawMap(gamespeed, ctx) {
+    drawMap(gamespeed, ctx, elapsed_time) {
+        //var temp = Math.floor( gamespeed * elapsed_time );
         if (this.y + gamespeed >= this.height + this.tile_height) {
             this.y = -this.height - this.tile_height + gamespeed;
         } else {

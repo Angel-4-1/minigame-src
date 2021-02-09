@@ -3,12 +3,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
 <!--Otras letras: Wendy One, Acme, Coiny, Righteous, Lilita One-->
 
-<div v-bind:class="[isPaused ? blurClass : '', bkClass]">
+<div v-bind:class="[isPaused || isQuiz ? blurClass : '', bkClass]">
     <div class="container">
         <MyCanvas ref="myCanvas"
             :characterID="characterID" 
             :levelID="levelID"
-            @openPauseMenu="openPauseMenu" />
+            @openPauseMenu="openPauseMenu"
+            @openQuiz="openQuiz"
+            @gameOver="gameOver" />
     </div>
 </div>
 
@@ -18,7 +20,14 @@
         @closePauseMenu="closePauseMenu"
         @resetGame="resetGame"
         @quitGame="quitGame" />
-    </transition>
+</transition>
+
+<transition name="zoom">
+    <QuizQuestion v-if="isQuizTime()"
+        :isQuiz="isQuiz"
+        @closeQuiz="closeQuiz"/>
+</transition>
+
 </template>
 
 <script>
@@ -26,12 +35,14 @@ import { mapState, mapMutations } from 'vuex';
 import { STAGES, CHARACTERS, LEVELS } from '@/consts.js';
 import MyCanvas from '@/components/MyCanvas.vue';
 import PauseMenu from '@/components/PauseMenu.vue';
+import QuizQuestion from '@/components/QuizQuestion.vue';
 
 export default {
     name: 'MainGame',
     components: {
         MyCanvas,
-        PauseMenu
+        PauseMenu,
+        QuizQuestion
     },
     props: [
         'levelID',
@@ -44,6 +55,7 @@ export default {
             level: LEVELS[ this.$props['levelID'] ],
             character: CHARACTERS[ this.$props['characterID'] ],
             isPaused: false,
+            isQuiz: false,
             bkClass: 'bk',
             blurClass: 'blur'
         }
@@ -52,8 +64,8 @@ export default {
         ...mapState( ['stage'] )
     },
     methods: {
-        gameOver() {
-            this.$emit('gameIsOver');
+        gameOver( data ) {
+            this.$emit('gameIsOver', data );
         },
         isGamePaused() {
             return this.isPaused;
@@ -64,6 +76,17 @@ export default {
         closePauseMenu() {
             this.isPaused = false;
             this.$refs.myCanvas.continueGame();
+        },
+        isQuizTime() {
+            return this.isQuiz;
+        },
+        closeQuiz() {
+            //sumar puntos si la respuesta es buena o guardarlos y al final se suman
+            this.isQuiz = false;
+            this.$refs.myCanvas.continueGame();
+        },
+        openQuiz() {
+            this.isQuiz = true;
         },
         resetGame() {
             this.isPaused = false;

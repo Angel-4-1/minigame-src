@@ -16,7 +16,8 @@
             </div>
 
             <div class="modal-text">
-                <p>{{ phrases.content }}</p>
+                <!-- Actualiza el valor del innerHTML -->
+                <p v-html="text"></p>
             </div>
 
             <div class="modal-footer">
@@ -39,12 +40,44 @@ export default {
     data() {
         return {
             instructor: INSTRUCTOR[0],
-            phrases: INSTRUCTOR[0].phrases[this.$props.phraseID]
+            phrases: INSTRUCTOR[0].phrases[this.$props.phraseID],
+            timer: null,
+            text: '',
+            stop: false,
+            speed: 60
         }
     },
     methods: {
         closePopUp() {
             this.$emit('closePopUp');
+        },
+        printTypeWriter() {
+            //Mientras tengamos algo para escribir
+            if ( this.stop == false ) {
+                //Limpiar lo que tengamos
+                this.stopTypeWriter();
+                var i = -1;
+                this.timer = setInterval( () => {
+                    i++;
+                    const x = i % this.phrases.content.length;
+                    this.text += this.phrases.content[x];
+                }, this.speed );
+            }
+        },
+        stopTypeWriter() {
+            clearInterval( this.timer );
+        }
+    },
+    mounted() {
+        this.printTypeWriter();
+    },
+    watch: {
+        text: function() {
+            //Parar cuando la variable text ya contenga todo el mensaje que queriamos mostrar
+            if ( this.text.length == this.phrases.content.length ) {
+                this.stop = true;
+                this.stopTypeWriter();
+            }
         }
     }
 }
@@ -119,7 +152,7 @@ export default {
 }
 
 .modal-title h1 {
-    font-size:calc(12px + 1.5vw);
+    font-size:calc(12px + 1.5vh);
     margin: 0;
 }
 
@@ -132,7 +165,7 @@ export default {
 }
 
 .modal-text p {
-    font-size:calc(5px + 1.5vw);
+    font-size:calc(5px + 1.4vh);
     color: #000000; 
     word-wrap: break-word;
     margin: 0;

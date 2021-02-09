@@ -2,17 +2,24 @@
 Mostrar una lista con los distintos personajes disponibles
 -->
 <template>
-    <h1 class="title">Choose a character</h1>
+    <div class="characters-container">
+        <div class="title">
+            <h1>Choose a character</h1>
+        </div>
+        
 
-    <div class="list">
-        <article v-for="(character, index) in characters" :key="index" @click="setCharacterID(character.id)">
-            <!--
-                <img :src="imageUrl + character.id + '.png'" width="96" height="96" alt="Image Not Found">
-            -->
-            <img class="image" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Character Icon Not Found">
-            <h3>{{ character.name }}</h3>
-        </article>
+        <div class="list">
+            
+            <article v-for="(character, index) in characters" :key="index" @click="setCharacterID(character.id)">
+                
+                <img class="image" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Character Icon Not Found">
+                <h3>{{ character.name }}</h3>
+            
+            </article>
+            
+        </div>
     </div>
+    
 </template>
 
 <script>
@@ -43,8 +50,19 @@ export default {
 </script>
 
 <style scoped>
+.characters-container {
+    display: grid;
+    grid-auto-rows: 10% 90%;
+    grid-template-areas: 
+        "title"
+        "list";
+    height: 90%;
+    grid-row-gap: 2%;
+}
+
+
 .list {
-    transform: translate(0, -10%);
+    grid-area: list;
     display: grid;  /*Los elementos se mostraran en formato grid*/
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));    /*Numero de columnas sera responsive*/
     grid-gap: 10px;
@@ -71,18 +89,22 @@ export default {
 
 h3 {
     margin: 0;
+    font-size: calc(11px + 0.5vh);
+    padding: 5px;
 }
 
 .title {
-  transform: translate(0, -70%);
+  /*transform: translate(0, -70%);*/
+    grid-area: title;
 }
 
 h1 {
     color: #ffffff;
+    font-size: calc(11px + 1.25vh);
 }
 
 .image {
-    border-radius: 50%;
+    /*border-radius: 50%;*/
     margin-top: 6%;
 }
 

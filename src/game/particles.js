@@ -1,5 +1,5 @@
 export class Particle {
-    constructor(_x, _y) {
+    constructor(_x, _y, _color) {
         this.x = _x;
         this.y = _y;
         this.radius = Math.random() * 20 + 1;
@@ -8,6 +8,7 @@ export class Particle {
         this.direction_y = Math.random() * 1 - 0.5; //-0.5  a  0.5
         //this.color = 'hsl(' + hue + ',100%, 50%, 0.8)';
         this.style = null;
+        this.color = _color;
     }
 
     update(gamespeed = 1) {
@@ -22,7 +23,7 @@ export class Particle {
     }
 
     getStyle() {
-        return 'rgba(0, 0, 0,' + this.opacity + ')';
+        return this.color + this.opacity + ')';
     }
 
     draw( ctx ) {

@@ -1,28 +1,22 @@
 <!-- PAUSE MENU -->
 <template>
-
-
-    <div class="pause-container">
+    <div class="quiz-container">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-        <div class="pause-menu" v-if="show">
+        <div class="quiz-menu" v-if="show">
 
-            <div class="pause-header">
-                <h1>PAUSE</h1>
+            <div class="quiz-header">
+                <h1>{{ questions[question_id].question }}</h1>
             </div>
 
             <!-- Botones parte inferior -->
-            <div class="pause-buttons">
-                <button class="btn" @click="closeMenu">RESUME</button>
-                <button class="btn" @click="reset">RESET</button>
-                <button class="btn" @click="closeMenu">SETTINGS</button>
-                <button class="btn btn-quit" @click="quit">EXIT</button>
-                <!--
-                    <button class="btn btn-close" @click="closeDetail"></button>
-                -->
+            <div class="quiz-buttons">
+                <button v-for="(answer, index) in questions[question_id].answers" :key="index" class="btn" @click="selectAnswer( answer.status )">
+                    {{ answer.name }}
+                </button>
             </div>
             
         </div>
@@ -31,36 +25,51 @@
 </template>
 
 <script>
+import { QUIZ_QUESTIONS } from '@/consts.js';
 
 export default {
-    name: 'PauseMenu',
+    name: 'QuizQuestion',
     emits: [                //aquello que emitimos al padre
-        'closePauseMenu',
-        'resetGame',
-        'quitGame' 
+        'closeQuiz'
     ],    
-    props: [ 'isPaused' ],
+    props: [ 'isQuiz' ],
     data() {
         return {
-            show: this.$props['isPaused']
+            show: this.$props['isQuiz'],
+            questions: QUIZ_QUESTIONS,
+            question_id: 0,
+            questions_array: []
         }
     },
     methods: {
-        closeMenu() { //salir del menu de pausa
+        selectAnswer( status ) { //salir del menu de pausa
             this.show = false;
-            this.$emit('closePauseMenu');
+            //es la opcion correcta ?
+            // ...
+            console.log( status );
+            //volver al juego
+            this.$emit('closeQuiz');
         },
-        reset() {
-            this.show = false;
-            this.$emit('resetGame');
+        randomIntFromInterval(min, max) { // min and max included 
+            return Math.floor(Math.random() * (max - min + 1) + min);
         },
-        quit() {
-            this.closeMenu();
-            this.$emit('quitGame');
+        chooseRandomQuestion() {
+            this.question_id = this.randomIntFromInterval( 0, this.questions.length - 1 );
+        },
+        //Mezclar el array
+        shuffle(array) {
+            for (var i = array.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
         }
     },
     created() {
         this.show = true;
+        this.chooseRandomQuestion();
+        this.shuffle( this.questions[this.question_id].answers );
     }
 }
 </script>
@@ -71,11 +80,11 @@ export default {
 }
 h1 {
     text-transform: capitalize;
-    font-size: 5vh;
+    font-size: 3vh;
 }
 
 /*CONTENEDOR PRINCIPAL*/
-.pause-container {
+.quiz-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -85,11 +94,10 @@ h1 {
     left: 0;
     width: 100%;
     height: 100vh;
-    /*background: rgba(0,0,0,.7); /*Oscurecer el fondo*/
 }
 
 /*RECUADRO BLANCO*/
-.pause-menu {
+.quiz-menu {
     position: relative;
     width: 100%;
     height: 70vh;
@@ -109,13 +117,13 @@ h1 {
     border: 3px solid black;
 }
 
-.pause-header {
+.quiz-header {
     grid-area: header;
 }
 
 
 /*BOTONES*/
-.pause-buttons {
+.quiz-buttons {
     grid-area: buttons;
 
     display: grid;
@@ -125,36 +133,25 @@ h1 {
 }
 
 /*FORMATO BOTONES*/
-.pause-buttons .btn {
+.quiz-buttons .btn {
     outline: none;
     border: none;
     border-radius: 20px;
 
     color: #000;
     cursor: pointer;
-
     
     background: rgb(113, 235, 178);
     cursor: pointer; 
     border: 3px solid rgb(255, 255, 255);
-    font-size: 2vh;
+    font-size: 2.5vh;
 
     font-family: 'Press Start 2P', sans-serif;
     letter-spacing: 1px;
 }
 
-.pause-buttons .btn:hover {
+.quiz-buttons .btn:hover {
     background: rgb(62, 138, 102);
-    color: white;
-}
-
-/*BOTON PARA CERRAR*/
-.pause-buttons .btn-quit {
-    background: rgb(236, 131, 131);
-}
-
-.pause-buttons .btn-quit:hover {
-    background: rgb(235, 34, 34);
     color: white;
 }
 
