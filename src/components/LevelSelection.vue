@@ -10,7 +10,8 @@
     @closePopUp="closePopUp"/>
 </transition>
 
-<div v-bind:class="[isOpen ? blurClass : '', bkClass]">
+<div class="selection-container">
+<div v-bind:class="[isOpen ? blurClass : '']">
   <div class="selection-div">
 
     <!-- Listado de niveles + botones en forma de circulo -->
@@ -63,8 +64,6 @@
 
         </div>  
       </div>
-      
-      <br>
 
       <!-- Botones en forma de circulo -->
       <div class="dots">
@@ -80,7 +79,8 @@
       </div>
     </div>
 
-    </div>
+  </div>
+</div>
 </div>
 </template>
 
@@ -158,14 +158,18 @@ export default {
   font-weight: normal;
 }
 
-.bk {
-  transition: all 0.5s ease-out;
-}
-
 .blur {
   filter: grayscale(100) blur(2px);
   /*Desactivar botones y cualquier interaccion posible*/
   pointer-events: none;
+}
+
+.selection-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -191,7 +195,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: radial-gradient(#ddd121, #867215);
+  background: radial-gradient(#21dd6f, #157986);
 }
 
 h1 {
@@ -204,6 +208,7 @@ h1 {
   justify-content: center;
   height: 100vh;
   resize: both;
+  margin: 0; padding: 0;
 }
 
 .slideshow-container {
@@ -390,7 +395,7 @@ h1 {
 /*Contenedor botones en formato circular*/
 .dots {
   position: absolute;
-  bottom: 3%;
+  bottom: 6%;
 }
 /*Botones individuales*/
 .dot {

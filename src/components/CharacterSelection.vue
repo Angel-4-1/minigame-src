@@ -11,7 +11,8 @@
         @closePopUp="closePopUp"/>
     </transition>
     
-    <div v-bind:class="[isOpen ? blurClass : '', bkClass]">
+    <div class="selection-container">
+        <div v-bind:class="[isOpen ? blurClass : '', bkClass]">
         <div class="selection-div">
             <CharacterList 
                 :imageUrl="imageUrl" 
@@ -26,7 +27,9 @@
                     @characterIsSelected="characterIsSelected"/>
             </transition>
         </div>
+        </div>
     </div>
+    
 </template>
 
 <script>
@@ -67,7 +70,8 @@ export default {
             this.characterID = '';
             this.showDetail = false;
         },
-        characterIsSelected() {
+        characterIsSelected( id ) {
+            this.characterID = id;
             this.$emit('characterIsSelected', this.characterID);
         },
         closePopUp() {
@@ -82,13 +86,21 @@ export default {
 
 <style scoped>
 .bk {
-  transition: all 0.5s ease-out;
+  /*transition: all 0.5s ease-out;*/
 }
 
 .blur {
   filter: grayscale(100) blur(2px);
   /*Desactivar botones y cualquier interaccion posible*/
   pointer-events: none;
+}
+
+.selection-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
 }
 
 .selection-div {

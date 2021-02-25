@@ -80,12 +80,13 @@ h1 {
     justify-content: center;
     align-items: center;
     /*flex-direction: column;*/
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
     /*background: rgba(0,0,0,.7); /*Oscurecer el fondo*/
+    
 }
 
 /*RECUADRO BLANCO*/

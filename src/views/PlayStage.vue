@@ -35,6 +35,10 @@ export default {
         LevelSelection,
         MainGame
     },
+    props: [
+        'prevCharacterID',
+        'prevLevelID'
+    ],
     data() {
         return {
             destination: stages_constants.FINAL_STAGE,
@@ -79,6 +83,15 @@ export default {
     mounted() {
         this.characterIsNotSelected = true;
         this.levelIsNotSelected = true;
+
+        var prevC = this.$props['prevCharacterID'];
+        var prevL = this.$props['prevlevelID'];
+        if ( prevC != -1 && prevL != -1 ) {
+            this.characterIsNotSelected = false;
+            this.levelIsNotSelected = false;
+            this.characterID = prevC;
+            this.levelID = prevL;
+        }
     }
 }
 </script>

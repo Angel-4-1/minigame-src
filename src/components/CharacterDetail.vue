@@ -1,47 +1,55 @@
 <!-- CHARACTER DETAIL -->
 <template>
     <div class="detail">
-        <div class="detail-view" v-if="show">
 
-            <div v-if="character" class="image">
-                <img class="myimage" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Image Not Found">
-            </div>
+        <div>
+            <transition name="flip">
 
-            <!-- Informacion sobre cada personaje -->
-            <div v-if="character" class="data">
-                <h2>{{ character.name }}</h2>
-                <div class="property">
-                    <div class="left">Base Experiecne</div>
-                    <div class="right">{{ character.data }}</div>
+                <div v-if="flipped == false" class="card">
+                    <span @click="closeDetail" class="close-card">X</span>
+                    <span @click="toggleCard()" class="toggle-card">I</span>
+                    
+                    <div class="detail-header">
+                        <span class="header-title"><h2>{{ character.name }}</h2></span>
+                    </div>
+
+                    <div class="detail-content-front">
+                        <span class="btn-left">
+                            <button class="btn" @click="changeView(false)"><a>&#10094;</a></button>
+                        </span>
+                        <span class="sprite-image" :style="{ background: `url(${require(`@/${character.sprite}`)}) 256px ${num}px` }"></span>
+                        <span class="btn-right">
+                            <button class="btn" @click="changeView(true)"><a>&#10095;</a></button>
+                        </span>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn btn-accept" @click="characterIsSelected">SELECT</button>
+                    </div>               
                 </div>
 
-                <div class="property">
-                    <div class="left">Base Experiecne</div>
-                    <div class="right">{{ character.data }}</div>
+                <div v-else class="card card-back">
+                    <span @click="closeDetail" class="close-card">X</span>
+                    <span @click="toggleCard(card)" class="toggle-card">I</span>
+
+                    <div class="detail-content-back">
+                        <div class="detail-properties">     
+                            <span class="header"><h3>Description</h3></span>
+                            <span class="data"><p>{{ character.data }}</p></span>
+                        </div>
+                        
+
+                        <div class="detail-abilities">
+                            <div class="header"><h3>Abilities</h3></div>
+                            <div class="type"><span>{{ character.ability }}</span></div>
+                        </div>
+                        
+                    </div>
+
                 </div>
 
-                <div class="property">
-                    <div class="left">Base Experiecne</div>
-                    <div class="right">{{ character.data }}</div>
-                </div>
-
-                <h3>Abilities</h3>
-                <div class="types">
-                    <div class="type">{{ character.ability }}</div>
-                    <div class="type">{{ character.ability }}</div>
-                    <div class="type">{{ character.ability }}</div>
-                </div>
-
-            </div>
-
-            <!-- Botones parte inferior -->
-            <div class="buttons">
-                <button class="btn btn-close" @click="closeDetail"></button>
-                <button class="btn btn-accept" @click="characterIsSelected"></button>
-            </div>
-            
+            </transition>
         </div>
-
     </div>
 </template>
 
@@ -58,7 +66,9 @@ export default {
     data() {
         return {
             show: false,
-            character: null
+            character: null,
+            flipped: false,
+            num: 0
         }
     },
     methods: {
@@ -72,9 +82,33 @@ export default {
         },
         characterIsSelected() {
             this.show = false;
-            this.$emit('characterIsSelected');
+            this.$emit('characterIsSelected', this.character.id);
+        },
+        toggleCard() {
+            this.flipped = !this.flipped;
+        },
+        changeView( isRight ) {
+            var newid = this.character.id;
+            if ( isRight ) {
+                newid++;
+            } else {
+                newid--;
+            }
+
+            var max = CHARACTERS.length;
+
+            if ( newid < 0 ) { 
+                newid = max - 1;
+            } else if ( newid > max - 1 ) {
+                newid = 0;
+            }
+           
+            this.pickCharacter(newid);
         }
     }, 
+    mounted() {
+        this.flipped = false;
+    },
     created() {
         this.pickCharacter(this.$props.characterID);
     }
@@ -89,145 +123,275 @@ h2 {
 h3 {
     width: 90%;
     max-width: 400;
-    border-bottom: 1px solid #ccc;
 }
 
 /*CONTENEDOR PRINCIPAL*/
 .detail {
+    /*Centrar*/
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    /*flex-direction: column;*/
+    align-items: center;
     position: absolute;
-    top: 0;
-    left: -10px;
-    padding: 90px 10px 10px;
     width: 100%;
     height: 100vh;
     background: rgba(0,0,0,.7); /*Oscurecer el fondo*/
 }
 
-/*RECUADRO BLANCO*/
-.detail .detail-view {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position: relative;
-    width: 100%;
-    height: 70vh;
-    max-width: 600px;
-    max-height: 650px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    margin: 5%;
+.detail-header {
+    grid-area: header;
 }
 
-/*IMAGEN*/
-.detail .detail-view .image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: -60px;
-    height: 120px;
-    width: 120px;
-    background-color: #333;
-    border-radius: 50%;
-    overflow: hidden;
+.header-img {
+    grid-area: header-img;
 }
 
-.myimage {
-    border-radius: 50%;
+.header-title {
+    grid-area: header-title;
 }
 
-/*DESCRIPCION DEL PERSONAJE*/
-.detail .detail-view .data {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 40px;
+.detail-content-front {
+    grid-area: detailcontent;
+    display: grid;
+    grid-template-columns: 20% 60% 20%;
+    grid-template-areas: 
+        "btn-left sprite-image btn-right";
 }
 
-/*LINEA DEBAJO DE LA DESCRIPCION*/
-.detail .detail-view .property {
-    width: 90%;
-    max-width: 400px;
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 10px;
+.detail-content-front .btn-left {
+    grid-area: btn-left;
+    margin: auto;
+    
 }
 
-/*TEXTO A LA IZQUIERDA*/
-.detail .detail-view .property .left{
-    float: left;
+.btn {
+    border: none;
+    outline: none;
+    background: none;
 }
 
-/*TEXTO A LA DERECHA*/
-.detail .detail-view .property .right{
-    float: right;
+.btn a {
+    font-size: 4vh;
+    font-weight: bold;
 }
 
-/*DISTRIBUCION HABILIDADES*/
-.detail .detail-view .types {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    width: 90%;
-    max-width: 400px;
+.btn a:hover {
+    font-size: 4vh;
+    font-weight: bold;
+    cursor: pointer;
+    color:rgb(71, 69, 69);
+    font-size: 5vh;
 }
 
-/*FORMATO HABILIDADES*/
-.detail .detail-view .type {
-    margin: 0 10px 10px 0;
-    padding: 5px 10px;
+.detail-content-front .btn-right {
+    grid-area: btn-right;
+    margin: auto;
+}
+
+.detail-content-front .sprite-image {
+    grid-area: sprite-image;
+    margin: auto;
+    height: 165px;
+    width: 128px;
+}
+
+.detail-content-back {
+    grid-area: detailcontent;
+    display: grid;
+    grid-template-rows: 70% 30%;
+    grid-template-areas: 
+        "properties"
+        "abilities";
+}
+
+.detail-content-back .property {
+    margin: 2%;
+    text-align: justify;
+    line-height: 1.5;
+    
+}
+
+.detail-properties {
+    grid-area: properties;
+    display: grid;
+    grid-template-rows: 23% 77%;
+    grid-template-areas: 
+        "header"
+        "property-data";
+    margin: 2%;
+    text-align: justify;
+    line-height: 1.5;
+}
+
+.detail-properties .header {
+    grid-area: header;
+}
+
+.detail-properties .header h3 {
+    border-bottom: 3px solid rgb(0, 0, 0);
+}
+
+.detail-properties .data {
+    grid-area: property-data;
+    overflow-y: auto;
+}
+
+.detail-abilities {
+    grid-area: abilities;
+    display: grid;
+    grid-template-rows: 50% 50%;
+    grid-template-areas: 
+        "header"
+        "type";
+    margin: 2%;
+    text-align: justify;
+}
+
+.detail-abilities .header {
+    grid-area: header;
+}
+
+.detail-abilities .header h3 {
+    border-bottom: 3px solid rgb(0, 0, 0);
+}
+
+.detail-abilities .type {
+    grid-area: type;
+    padding-top: 2%;
+    margin-top: 1%;
+}
+
+.detail-abilities .type span {
+    background: rgb(135, 199, 236);
+    padding: 2%; 
     border-radius: 20px;
-    color: #fff;
-    font-size: 1rem;
-    letter-spacing: 2px;
-    text-transform: capitalize;
-    word-wrap: none;
-    word-break: keep-all; 
-    background-color: #0A2E50;
+    color: white;
 }
+
+
+
 
 /*BOTONES*/
 .detail .buttons {
-    /*2 columnas*/
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-column-gap: 100px;
+    grid-area: buttons;
+    justify-items: center;
+    padding: 2%;
+    justify-content: center;
 }
 
 /*FORMATO BOTONES*/
 .detail .buttons .btn {
     outline: none;
     border: none;
-    border-radius: 50%;
-    color: #efefef;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    border-radius: 10px;
+
+    color: #000;
     cursor: pointer;
-    width: 60px;
-    height: 60px;
+
+    background: rgb(113, 235, 178);
+    cursor: pointer; 
+    
+    font-size: 2vh;
+
+    font-family: 'Press Start 2P', sans-serif;
+    letter-spacing: 1px;
+
+    width: 100%;
+    height: 100%;
 }
 
-/*BOTON PARA CERRAR*/
-.detail .buttons .btn-close {
-    background-image: url('../assets/cross.png');
-    background-size: cover;
-}
 
 /*BOTON PARA ACEPTAR*/
 .detail .buttons .btn-accept {
-    background-image: url('../assets/check.png');
+    /*background-image: url('../assets/check.png');
     background-size: cover;
+    grid-area: btnright;*/
+    border: 3px solid rgb(145, 226, 138);
 }
 
-.detail .buttons .btn-accept:hover, .detail .buttons .btn-close:hover {
+.detail .buttons .btn-close:hover {
     opacity: 0.5;
+    border: 3px solid rgb(255, 0, 0);
 }
 
+.detail .buttons .btn-accept:hover {
+    opacity: 0.5;
+    border: 3px solid rgb(0, 255, 0);
+}
+
+
+
+
+.card {
+    background-color: #ffffff;
+    height: 70vh;
+    width: 95vw;
+    position: relative;
+    top: 0;
+    left: 0;
+    max-width: 600px;
+    max-height: 600px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-rows: 20% 60% 20%;
+    grid-template-areas: 
+        "header"
+        "detailcontent"
+        "buttons";    
+}
+
+.card-back {
+    grid-template-rows: 5% 95%;
+    grid-template-areas: 
+        "header"
+        "detailcontent";    
+}
+
+
+.close-card {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 10px 15px;
+    opacity: .6;
+    transition: all 0.5s ease;
+    color: red;
+    font-size: 3vh;
+    cursor: pointer;
+}
+
+.close-card:hover {
+    opacity: 1;
+    transform: rotate(360deg);
+}
+
+.toggle-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 10px 15px;
+    opacity: .6;
+    transition: all 0.5s ease;
+    color: rgb(0, 132, 255);
+    font-size: 3vh;
+    cursor: pointer;
+}
+
+.toggle-card:hover {
+    opacity: 1;
+    transform: rotate(-360deg);
+}
+
+/**FLIP TRANSITION**/
+.flip-enter-active {
+    transition: all 0.4s ease;
+}
+
+.flip-leave-active {
+    display: none;
+}
+
+.flip-enter-from, .flip-leave-to {
+    transform: rotateY(180deg);
+    opacity: 0;
+}
 </style>

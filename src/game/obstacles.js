@@ -1,45 +1,50 @@
 import * as UTILS from '../game/utils.js';
-var pause_event = new Event('pause');
 
 export class Obstacle {
-    constructor(_sprite, _x, _y, _width, _height, _speed, _type, _spawn_points) {
+    constructor(_sprite, _x, _y, _width, _height, _speed, _type, _spawn_points, _spx = 345, _level = 0) {
         this.sprite = _sprite;
         this.x = _x;            //Posicion
         this.y = _y;            
         this.width = _width;    //Dimensiones
         this.height = _height;
         this.speed = _speed;    //Velocidad
-        this.type = _type.id;      //Tipo de obstaculo
+        this.type = _type.type;      //Tipo de obstaculo
         this.spawn_points = _spawn_points;
         this.isHit = false;
         this.sx = _type.x;
+        this.isEnd = false; //needs to be destroyed
+        this.show = true;
+        this.t = 0;
+        this.spx = _spx;
+        this.level = _level;
         /*Puntos de aparicon, tendra la siguiente estructura: 
           spawn_points: { total: X, points: [] } */
     }
 
     draw(ctx) {
-        ctx.fillStyle = 'red';
-        //ctx.fillRect(this.x, this.y, this.width, this.height);
-        UTILS.drawImageAtPoint(ctx, this.sprite, this.sx, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        if ( this.show ) {
+            UTILS.drawImageAtPoint(ctx, this.sprite, this.sx, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
     }
 
     update(gamespeed, canvas, score, elapsed_time) {
         //var temp = Math.floor( gamespeed * elapsed_time );
 
         this.y += this.speed * gamespeed;
-        if ( this.y > canvas.height + this.height ) {
-            this.y = 0 - this.height;
-            //Escoger un nuevo punto de aparicion en el eje x
-            this.x = this.getSpawnedPoint();
+
+        if ( this.level == 1 ) {
+            this.t += 0.5 * gamespeed * elapsed_time;
+            this.x = this.spx + ( Math.sin( this.t ) * 150 );
+        }
+        
+        if ( this.y > canvas.height + this.height) {
+        //this.y += this.speed * gamespeed * elapsed_time * 60;
+        //if ( this.y > canvas.height + this.height - temp) {
+            //this.y = 0 - this.height;
             if (!this.isHit) {
                 score++;
-
-                var rt = getRandomObstacleType();
-                this.sx = OBS_TYPE[rt].x;
-                this.type = OBS_TYPE[rt].id;
             }
-
-            this.isHit = false;
+            this.isEnd = true;
         }
 
         return score;
@@ -62,7 +67,36 @@ function getRandomObstacleType() {
     return Math.floor( Math.random() * OBS_TYPE.length );
 }
 
-export function initObstacles(_sprite, obstacles_array, spawn_points) {
+export function createObstacle( _sprite, spawn_points, level, minY = 0, minX = 0 ) {
+
+    var y = 0;
+    if ( (y + 225) >= minY ) {
+        y = minY - 400;
+    }
+
+    if ( y < -500 ) {
+        return null;
+    }
+
+    var random = Math.floor(Math.random() * spawn_points.total);
+    //345 650
+    var rnd = Math.floor( Math.random() * 2 );
+    var spx = rnd == 0 ? 345 : 650;
+    var x = 0;
+
+    //Seleccionar un punto aleatorio de aparicion
+    if ( random >= 0 && random < spawn_points.total ) {
+        x = spawn_points.points[random];
+    } else {
+        x = spawn_points.points[0];
+    }
+
+    var random_type = getRandomObstacleType();
+
+    return new Obstacle(_sprite, x, y, 250, 225, 1, OBS_TYPE[random_type], spawn_points, spx, level);
+} 
+
+export function initObstacles(_sprite, obstacles_array, spawn_points, level) {
     for (let i = 0; i < 2; i++) {
         var y = i * -750;
         var random = Math.floor(Math.random() * spawn_points.total);
@@ -77,7 +111,7 @@ export function initObstacles(_sprite, obstacles_array, spawn_points) {
 
         var random_type = getRandomObstacleType();
 
-        obstacles_array.push(new Obstacle(_sprite, x, y, 250, 225, 1, OBS_TYPE[random_type], spawn_points) ); 
+        obstacles_array.push(new Obstacle(_sprite, x, y, 250, 225, 1, OBS_TYPE[random_type], 345, level) ); 
     }
     
     return obstacles_array;

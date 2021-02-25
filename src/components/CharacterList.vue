@@ -2,6 +2,7 @@
 Mostrar una lista con los distintos personajes disponibles
 -->
 <template>
+<div class="mycontain">
     <div class="characters-container">
         <div class="title">
             <h1>Choose a character</h1>
@@ -19,7 +20,7 @@ Mostrar una lista con los distintos personajes disponibles
             
         </div>
     </div>
-    
+</div>
 </template>
 
 <script>
@@ -42,17 +43,27 @@ export default {
         setCharacterID(id) {
             this.$emit('setCharacterID', id);
         }
-    }/*, 
-    created: {
     }
-    */
 }
 </script>
 
 <style scoped>
+.mycontain {
+    /*Centrar*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    left: 50%;
+    width: 100%;
+    height: 100vh;
+}
+
 .characters-container {
     display: grid;
-    grid-auto-rows: 10% 90%;
+    grid-auto-rows: 10% 88%;
     grid-template-areas: 
         "title"
         "list";

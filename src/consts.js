@@ -9,7 +9,7 @@ export const STAGES = {
 };
 
 export const CHARACTERS = [
-    { name: "Basic boy"   , id: 0, icon: "assets/characters/boy_face.png"   , data: "Something" , has_ability: false, ability: "Run" , sprite: "assets/characters/boy_spritesheet.png" , 
+    { name: "Basic boy"   , id: 0, icon: "assets/characters/boy_face.png"   , data: "This character represents that inexperienced user who enters a social media for the first time, so he does not have sufficient knowledge about what he should and should not publish on the network since he is unaware of the risks of publishing his private information to the outside world and the effects that this would mean" , has_ability: false, ability: "None" , sprite: "assets/characters/boy_spritesheet.png" , 
     sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
         [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
         [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
@@ -23,7 +23,7 @@ export const CHARACTERS = [
         [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
         [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
     ], map: [ 0, 1 ] },
-    { name: "Amateur" , id: 2, icon: "assets/characters/senior_face.png" , data: "Something" , has_ability: false, ability: "Run" , sprite: "assets/characters/senior_spritesheet.png" , 
+    { name: "Amateur" , id: 2, icon: "assets/characters/senior_face.png" , data: "Something" , has_ability: true, ability: "Darkness" , sprite: "assets/characters/senior_spritesheet.png" , 
     sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
         [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
         [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
@@ -62,7 +62,7 @@ export const MAPS = [
 ]
 
 export const INSTRUCTOR = [
-    { id: 0, icon: "assets/characters/boy_face.png" , phrases: [ 
+    { id: 0, icon: "assets/characters/instructor_face.png" , phrases: [ 
         { title: "WELCOME!", content: "It's time to start playing, but before you must choose a level"},    //Level Selection
         { title: "OKAY THEN", content: "Now choose a character, but remember, each of them has unique abilities"}   //Character Selection
     ]}

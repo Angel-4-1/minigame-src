@@ -52,6 +52,7 @@ export default {
     props: [
         'score_obtained'
     ],
+    emits: [ 'resetGame' ],
     data() {
         return {
             destination: stages_constants.PLAY_STAGE,
@@ -59,7 +60,10 @@ export default {
             game_score: 0,
             bonus_score: 0,
             total_score: 0,
-            time: 0
+            time: 0,
+            character_id: 0,
+            level_id: 0,
+            BGaudio: null
         }
     },
     computed: {
@@ -70,19 +74,41 @@ export default {
             this.$store.commit('changeState', { index: this.id, destination: mydestination });
         },
         reset() {
-
+            var msg = { characterID: this.character_id, levelID: this.level_id };
+            this.$emit('resetGame', JSON.stringify( msg ) );
+            this.changeState(this.destination);
         },
         goHome() {
+            var msg = { characterID: -1, levelID: -1 };
+            this.$emit('resetGame', JSON.stringify( msg ) );
             this.changeState(this.destination);
+        },
+        playSound() {
+            this.BGaudio.currentTime = 0;
+            this.BGaudio.play(); 
         }
     },
     mounted() {
-        //this.$props['score_obtained'] = { score: integer, character: integer, level: integer, time: integer }
+        //this.$props['score_obtained'] = { score: integer, bonus: integer, character: integer, level: integer, time: integer }
         console.log( this.$props['score_obtained'] );
         var data = JSON.parse( this.$props['score_obtained'] );
         this.game_score = data.score;
+        this.bonus_score = data.bonus;
         this.time = data.time;
+        this.character_id = data.character;
+        this.level_id = data.level;
         this.total_score = this.game_score + this.bonus_score;
+
+        /**AUDIO**/
+        this.BGaudio = new Audio( require(`@/assets/audio/Gameover1.ogg`));
+        this.BGaudio.volume = 0.2;
+        this.BGaudio.play();
+        this.BGaudio.addEventListener( 'ended', this.playSound );
+    },
+    unmounted() {
+        this.BGaudio.pause();
+        this.BGaudio.currentTime = 0;
+        this.BGaudio.removeEventListener( 'ended', this.playSound );
     }
 }
 </script>
@@ -95,9 +121,10 @@ export default {
     justify-content: center;
     align-items: center;
     /*flex-direction: column;*/
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
     height: 100vh;
 }
@@ -114,7 +141,7 @@ h2 {
 .board-menu {
     position: relative;
     width: 100%;
-    height: 70vh;
+    height: 80vh;
     max-width: 600px;
     max-height: 650px;
     background-color: #ffffff;
@@ -147,6 +174,7 @@ h2 {
         "bonus-score"
         "total-score";
     justify-items: center;
+    overflow-y: auto;
 }
 
 .board-content .score{
@@ -173,14 +201,23 @@ h2 {
 
 .property{
     width: 80%;
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-areas: 
+        "left right";
+    justify-items: center;
 }
 
 .left {
-    float: left;
+    grid-area: left;
+    width: 100%;
+    text-align: left;
 }
 
 .right {
-    float: right;
+    grid-area: right;
+    width: 100%;
+    text-align: right;
 }
 
 /*BOTONES*/

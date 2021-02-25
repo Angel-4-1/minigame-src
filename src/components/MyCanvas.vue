@@ -13,7 +13,10 @@ import { STAGES, CHARACTERS, LEVELS, MAPS } from '@/consts.js';
 import * as PLAYER from '../game/player.js';
 import * as BUTTON from '../game/button.js';
 import * as BACKGROUND from '../game/background.js';
+import * as ABILITY from '../game/ability.js';
 import * as OBSTACLE from '../game/obstacles.js';
+import * as EXPLOSION from '../game/explosion.js';
+import * as RESOURCE from '../game/resources.js';
 import * as UTILS from '../game/utils.js';
 import * as GAMEMAP from '../game/gamemap.js';
 import * as PARTICLE from '../game/particles.js';
@@ -49,11 +52,27 @@ export default {
 
             /**OBSTACULOS**/
             obstacles: [],
+            obstacles_interval: 100,    //separacion entre obstaculos
+            obs_img: null,
+            obs_minY: 999,
+            obs_minX: 999,
+            explosions: [],
+            explosion_imgs: [],
+
+            /**RESOURCES**/
+            resources: [],
+            resources_interval: 400,
+            res_img: null,
+
+            /**ABILITY**/
+            ability: null,
+            ability_isActive: false,
 
             /**NIVEL**/
             //level: LEVELS[ this.$props['levelID'] ],
             //tileset: LEVELS[ this.$props['levelID'] ].tileset,
             tileset_snow: false,
+            level: 0,
 
             /**MAPA */
             maps: null,
@@ -70,6 +89,10 @@ export default {
                 points: [192, 498, 806]
             },
 
+            /**PUNTOS**/
+            score: 0,
+            bonus_score: 0,
+
             /**OTRAS VARIABLES**/
             globalID_animation: 0,  //controlar el animation frame request
             gamespeed: 4,
@@ -82,26 +105,39 @@ export default {
             date_now: null,         //tiempo en el que el juego se ha iniciado
             image_buttons: null,    //imagen sprite de los botones que hay en pantalla
             image_buttons_data: { x: 900, y: 10, width: 80, height: 80, offset: 128, active: false },
-            frames_done: 0,
+            
             background: null,       //fondo
-            score: 0,
+            
             collisions: 0,
             collision_image: null,
             last: 0,                //timestamp frame anterior
             color_header: "rgba(250, 200, 200, 1)",
             ability_button: null,
             image_container: {},
-            images_preload: 7,
+            images_preload: 11,
             images_current: 0,
             finish: null,
+            full_size: false,
+            ratio: 1,
+
+            /**FRAMES**/
+            total_frames: 0,
+            //Cicle
+            frames_done: 0,
+            frameLastSecond: 0,
 
             /**TILEMAP**/
             game_map: null,
             current_sec: 0,
-            frameLastSecond: 0,
 
             /**FLOATING MESSAGES**/
-            floatingMessages: []
+            floatingMessages: [],
+
+            /**LIVES**/
+            heart_img: null,
+
+            /**AUDIO**/
+            pickResource: null
         }
     },
     methods: {
@@ -141,16 +177,21 @@ export default {
         continueGame() {
             this.status = true;
             document.dispatchEvent(this.play_event);
+            this.clearObstacles();
+            this.clearResources();
         },
         gameOver() {
-            console.log( "GAME OVER" );
             this.status = false;
             document.dispatchEvent(this.pause_event);
             //this.cancelAnimation();
             //this.pauseGame();
             //cancelAnimationFrame(this.globalID_animation);
-            var msg = { score: this.score, character: this.$props['characterID'], level: this.$props['levelID'], time: this.active_time };
+            var msg = { score: this.score, bonus: this.bonus_score, character: this.$props['characterID'], level: this.$props['levelID'], time: this.active_time };
             this.$emit( 'gameOver', JSON.stringify( msg ) );       
+        },
+        handleBonus( bonus ) {
+            var data = JSON.parse( bonus );
+            this.bonus_score += data.bonus;
         },
         //Cuando se ha pulsado el raton o tocado la pantalla
         mousedown(e) {
@@ -183,25 +224,36 @@ export default {
                     
                 } else if ( this.character.has_ability ) {
                     if ( this.ability_button.isHit(x,y) ) {
-                        if (this.tileset_snow) { 
-                            this.changeTileset( MAPS[ this.maps[0] ].tileset );
-                            this.tileset_snow = false;
-                            this.gamespeed = 4;
-                            this.isSnowing = false;
-                            this.player.changeParticleColor( "rgba(0,0,0,");
-                            this.color_header = "rgba(250, 200, 200, 1)";
-                            this.ability_button.active = false;
-                        } else {
-                            this.changeTileset( MAPS[ this.maps[1] ].tileset );
-                            this.tileset_snow = true;
-                            this.gamespeed = 2;
-                            this.isSnowing = true;
-                            this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
-                            this.snow.createSnowParticles();
-                            this.player.changeParticleColor( "rgba(255,255,255,");
-                            this.color_header = "rgba(150, 220, 240, 1)";
-                            this.ability_button.active = true;
+                        this.ability_isActive = !this.ability_isActive;
+                        switch (this.character.ability) {
+                            case "Darkness":
+                                this.ability.type = 1;
+                                this.ability.color = "rgba(204, 153, 0, 0.2)";
+                               // this.ability.color = "rgba(0, 0, 0, 0.4)";
+                                break;
+                            default:
+                                if (this.tileset_snow) { 
+                                    this.changeTileset( MAPS[ this.maps[0] ].tileset );
+                                    this.tileset_snow = false;
+                                    this.gamespeed = 4;
+                                    this.isSnowing = false;
+                                    this.player.changeParticleColor( "rgba(0,0,0,");
+                                    this.color_header = "rgba(250, 200, 200, 1)";
+                                    this.ability_button.active = false;
+                                } else {
+                                    this.changeTileset( MAPS[ this.maps[1] ].tileset );
+                                    this.tileset_snow = true;
+                                    this.gamespeed = 2;
+                                    this.isSnowing = true;
+                                    this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
+                                    this.snow.createSnowParticles();
+                                    this.player.changeParticleColor( "rgba(255,255,255,");
+                                    this.color_header = "rgba(150, 220, 240, 1)";
+                                    this.ability_button.active = true;
+                                }
+                                break;
                         }
+                        
                     }
                 }
                 return;
@@ -254,7 +306,12 @@ export default {
                     case 39:    //right key
                         this.player.move(true);
                         break;
+                    case 83:    // S
+                        this.full_size = !this.full_size;
+                        this.onResize();
+                        break;
                     default:
+                        //console.log( event.keyCode)
                         break;
                 }
             } else {
@@ -269,7 +326,9 @@ export default {
             this.context.font = "60px Press Start 2P";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
             this.context.fillText("S: " + this.score, 400, 70);
-            this.context.fillText("C: " + this.collisions, 600, 70);
+            //var img = this.getImage( require(`@/assets/heart.png`) );
+            UTILS.drawImageAtPoint(this.context, this.heart_img, 0, 0, 128, 128, 700, 50, 120, 120);
+            this.context.fillText(this.player.lives, 682, 72);
         },
         //Se llama en cada ciclo del juego
         update( elapsed_time ) {
@@ -280,12 +339,14 @@ export default {
                 this.player.moveOnMouseDown( elapsed_time, this.gamespeed );
             }
 
-            var obs_score = OBSTACLE.handleObstacles(this.obstacles, this.context, this.canvas, this.gamespeed, this.score, elapsed_time);
-            this.obstacles = obs_score[0];
-            this.score = obs_score[1];
+            this.handleObstacles( elapsed_time );
+
+            this.handleResources( elapsed_time );
 
             //isHit ?
             this.handleCollisions();
+
+            this.handleExplosions();
 
             //snow
             if ( this.isSnowing ) { this.snow.update(); }
@@ -298,17 +359,134 @@ export default {
             }
         },
         handleCollisions() {
+            //Obstacles
             for (let i = 0; i < this.obstacles.length; i++ ) {
+                if ( this.obstacles[i].isEnd || this.obstacles[i].isHit ) {
+                    continue;
+                }
+
                 if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.obstacles[i].x, this.obstacles[i].y, this.obstacles[i].width, this.obstacles[i].height, true ) && this.obstacles[i].isHit == false ) {
                     this.collisions++;
                     this.obstacles[i].isHit = true;
-                    this.floatingMessages.push( 
-                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "COLLISION", 20, 3 )
+                    this.obstacles[i].show = false;
+                    /*this.floatingMessages.push( 
+                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "-{&#10084;}", 20, 3 )
+                    );*/
+                    var explosion_rnd = Math.floor(Math.random() * this.explosion_imgs.length);
+                    this.explosions.push(
+                        new EXPLOSION.Explosion( this.explosion_imgs[explosion_rnd], this.obstacles[i].x, this.obstacles[i].y, 250, 250, 250)
                     );
+
                     var alive = this.player.updateLive();
                     if ( !alive ) { //game over
                         this.gameOver();
                     }
+                }
+            }
+
+            //Resources
+            for (let i = 0; i < this.resources.length; i++ ) {
+                if ( this.resources[i].isEnd || this.resources[i].isHit ) {
+                    continue;
+                }
+
+                if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.resources[i].x, this.resources[i].y, this.resources[i].width, this.resources[i].height, true ) && this.resources[i].isHit == false ) {
+                    this.resources[i].isHit = true;
+                    this.pickResource.play();
+                    this.floatingMessages.push( 
+                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "RESOURCE", 20, 3 )
+                    );
+                    
+                    if ( this.resources[i].type == "QUIZ" ) {
+                        this.status = false;
+                        document.dispatchEvent(this.pause_event);
+                        this.$emit('openQuiz');
+                    } else if ( this.resources[i].type == "HEALTH" ) {
+                        this.player.increaseLive();
+                    }
+                }
+            }
+        },
+        handleObstacles( elapsed_time ) {
+            this.obs_minY = 999;
+            //this.obs_minX = 999;
+
+            for (let i = 0; i < this.obstacles.length; i++ ) {
+                if ( this.obstacles[i] == null ) {
+                    continue;
+                }
+
+                if ( this.obstacles[i].isEnd ) {
+                    continue;
+                }
+
+                var prev_score = this.score;
+                this.score = this.obstacles[i].update(this.gamespeed, this.canvas, this.score, elapsed_time);
+                this.obstacles[i].draw(this.context);
+
+                if ( prev_score != this.score ) {
+                    this.floatingMessages.push( 
+                        new FLOATINGMESSAGE.floatingMessage( this.obstacles[i].x, this.player.pos.y - 100, "+1", 20, 3, "rgba(0, 0, 0," )
+                    );
+                }
+
+                if ( this.obstacles[i].y < this.obs_minY ) {
+                    this.obs_minY = this.obstacles[i].y;
+                    //this.obs_minX = this.obstacles[i].x;
+                }
+                
+                //Lo elimina pero produce un blink en la pantalla ya que se ha de rehacer el array
+                /*if ( this.obstacles[i].isEnd ) {
+                        this.obstacles.splice( i, 1 );
+                    }*/
+            }
+
+            if ( this.total_frames % this.obstacles_interval == 0 ) {
+                var obs = OBSTACLE.createObstacle( this.obs_img, this.spawn_points, this.level, this.obs_minY, this.obs_minX );
+                if ( obs != null ) {
+                    this.obstacles.push( obs );
+
+                    if ( this.obstacles_interval > 50) { 
+                        this.obstacles_interval -= 50; 
+                    }
+                }         
+            }
+        },
+        clearObstacles() {
+            for (let i = 0; i < this.obstacles.length; i++ ) {
+                if ( this.obstacles[i].isEnd || this.obstacles[i].isHit ) {
+                    this.obstacles.splice( i, 1 );
+                    i--;
+                }
+            }
+        },
+        handleResources( elapsed_time ) {
+            for (let i = 0; i < this.resources.length; i++ ) {
+                if ( this.resources[i] == null ) {
+                    continue;
+                }
+
+               if ( this.resources[i].isEnd || this.resources[i].isHit ) {
+                    continue;
+                }
+
+                this.resources[i].update(this.gamespeed, this.canvas, elapsed_time);
+                this.resources[i].draw(this.context);
+            }
+
+            if ( this.total_frames % this.resources_interval == 0 && this.active_time >= 5 ) {
+                var res = RESOURCE.createResource( this.res_img, this.spawn_points, this.obs_minY );
+                if ( res != null ) {
+                    this.resources.push( res );
+                }
+            }
+            
+        },
+        clearResources() {
+            for (let i = 0; i < this.resources.length; i++ ) {
+                if ( this.resources[i].isEnd || this.resources[i].isHit ) {
+                    this.resources.splice( i, 1 );
+                    i--;
                 }
             }
         },
@@ -328,11 +506,13 @@ export default {
             //Player
             this.player.draw(this.context);
 
-            //Snow
-            if ( this.isSnowing ) { 
-                this.snow.draw( this.context );
-                this.context.fillStyle = "rgba(0, 204, 204, 0.2)";
-                this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            if ( this.ability_isActive ) {
+                //Snow
+                if ( this.isSnowing ) { 
+                    this.snow.draw( this.context );
+                }
+                
+                this.ability.draw( this.context, this.canvas, this.player.pos );
             }
 
             //Encabezado
@@ -353,6 +533,8 @@ export default {
             this.drawFPS();
 
             this.display.drawImage(this.context.canvas, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.display.canvas.width, this.display.canvas.height);
+
+            this.total_frames++;
 
             //Loop infinito
             if ( this.status ) {
@@ -407,26 +589,42 @@ export default {
             this.score = 0;
             this.collisions = 0;
             this.obstacles.length = 0;
-            this.obstacles = OBSTACLE.initObstacles(this.$refs.obstacles, this.obstacles, this.spawn_points); 
+            this.obstacles = OBSTACLE.initObstacles( this.obs_img, this.obstacles, this.spawn_points); 
         },
         onResize() {
-            this.display.canvas.height = document.documentElement.clientHeight - 0.05*document.documentElement.clientHeight;
-            
-            if (this.display.canvas.height > document.documentElement.clientWidth) {
-                this.display.canvas.height = document.documentElement.clientWidth;
+            if ( this.full_size ) {
+                this.display.canvas.height = window.innerHeight;
+                this.display.canvas.width = window.innerWidth;
+            } else {
+                this.display.canvas.height = document.documentElement.clientHeight - 0.05*document.documentElement.clientHeight;
+                
+                if (this.display.canvas.height > document.documentElement.clientWidth) {
+                    this.display.canvas.height = document.documentElement.clientWidth;
+                }
+
+                this.display.canvas.width = this.display.canvas.height * 0.95;
+                this.display.imageSmoothingEnabled = false;
             }
 
-            this.display.canvas.width = this.display.canvas.height * 0.9;
-            this.display.imageSmoothingEnabled = false;
+            this.ratio = this.display.canvas.width / this.display.canvas.height;
         },
         handleFloatingMessages() {
             for ( var i = 0; i < this.floatingMessages.length; i++) {
                 this.floatingMessages[i].update();
                 this.floatingMessages[i].draw( this.context );
-                /*this.floatingMessages[e].lifeSpan <= .01 && (floatingMessages.splice(e, 1),
-                    e--)*/
+
                 if ( this.floatingMessages[i].life < 0.2 ) {
                     this.floatingMessages.splice(i, 1);
+                }
+            }
+        },
+        handleExplosions() {
+            for ( var e = 0; e < this.explosions.length; e++ ) {
+                this.explosions[e].update();
+                this.explosions[e].draw( this.context );
+
+                if ( this.explosions[e].current_frame >= 7 ) {
+                    this.explosions.splice(e, 1);
                 }
             }
         },
@@ -460,12 +658,24 @@ export default {
         }
     },
     mounted() {
+        var regex =  /iPhone|iPad|iPod|Android/i;
+        var isMobile = regex.test(navigator.userAgent);
+        if ( isMobile ) {
+            //console.log( "IS MOBILE");
+            this.full_size = true;
+            document.getElementById( "canvas" ).style.setProperty( "margin", "0" );
+        } else {
+            //console.log( "IS DESKTOP");
+            this.full_size = false;
+        }
         this.status = true;
         /**INSTANCIAR VARIABLES INICIALES**/
         this.canvas  = document.createElement("canvas");
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext('2d', {alpha: false} );
         this.display_canvas = document.querySelector("canvas");
-        this.display = document.querySelector("canvas").getContext("2d");
+        this.display = document.querySelector("canvas").getContext("2d", {alpha: false} );
+        this.context.imageSmoothingEnabled = false;
+        this.display.imageSmoothingEnabled = false;
         //Dimensiones iniciales
         this.context.canvas.width = 1000;
         this.context.canvas.height = 1000;
@@ -474,6 +684,8 @@ export default {
 
         //Mostrar texxt Loading
         this.loadingScreen();
+
+        this.level = this.$props['levelID'];
         
         var that = this;
 
@@ -509,9 +721,20 @@ export default {
 
         /**HABILIDAD**/
         if ( this.character.has_ability ) {
-            var ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+            
+            var ability_img;
+            switch( this.character.ability ) {
+                case "Darkness":
+                    console.log("Darkness ability");
+                    ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+                    break;
+                default:    //Snow
+                    ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+                    break;
+            }
             ability_img.addEventListener("load", function(event) { 
                 that.ability_button = new BUTTON.Button(ability_img, 880, 110, 100, 100, 125, false, 31, true);
+                that.ability = new ABILITY.Ability( ability_img );
                 that.buttons.push(that.ability_button);
                 console.log("ABILITY LOADED");
                 that.images_current++;
@@ -532,15 +755,45 @@ export default {
         
 
         /**OBSTACULOS**/
-        var obs_img = this.getImage( require(`@/assets/obstacles.png`) );
-        obs_img.addEventListener("load", function(event) { 
-            that.obstacles = OBSTACLE.initObstacles(obs_img, that.obstacles, that.spawn_points);
+        this.obs_img = this.getImage( require(`@/assets/obstacles.png`) );
+        this.obs_img.addEventListener("load", function(event) { 
+            //that.obstacles = OBSTACLE.initObstacles(that.obs_img, that.obstacles, that.spawn_points, that.level);
             console.log("OBSTACLES LOADED");
             that.images_current++;
         });
+
+        /**EXPLOSION**/
+        var explosion_img1 = this.getImage( require(`@/assets/explosion1.png`) );
+        explosion_img1.addEventListener("load", function(event) { 
+            that.explosion_imgs.push( explosion_img1 );
+            console.log("EXPLOSION 1 LOADED");
+            that.images_current++;
+        });
+
+        var explosion_img2 = this.getImage( require(`@/assets/explosion2.png`) );
+        explosion_img2.addEventListener("load", function(event) { 
+            that.explosion_imgs.push( explosion_img2 );
+            console.log("EXPLOSION 1 LOADED");
+            that.images_current++;
+        });
+
+        /**RESOURCES**/
+        this.res_img = this.getImage( require(`@/assets/resources.png`) );
+        this.res_img.addEventListener("load", function(event) { 
+            console.log("RESOURCES LOADED");
+            that.images_current++;
+        });
+
+        /**LIVES**/
+        this.heart_img = this.getImage( require(`@/assets/heart.png`) );
+        this.heart_img.addEventListener("load", function(event) { 
+            console.log("HEART LOADED");
+            that.images_current++;
+        });
         
-        /**COLLISION**/
-        //this.collision_image = this.$refs.collision;
+        /**AUDIO**/
+        this.pickResource = new Audio( require(`@/assets/audio/Item.ogg`));
+        this.pickResource.volume = 0.2;
 
         /**MAPA**/
         this.maps = this.character.map;

@@ -122,8 +122,8 @@ export default {
 .avatar {
     max-height: 100%;
     max-width: 100%;
-    background: black;
-    border: 4px solid red;
+    /*background: black;
+    border: 4px solid red;*/
     margin: 0;
 }
 

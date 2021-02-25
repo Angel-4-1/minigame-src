@@ -26,6 +26,8 @@
 
 <script>
 import { QUIZ_QUESTIONS } from '@/consts.js';
+import '../game/confetti.js';
+import { launchConfetti } from '../game/confetti.js';
 
 export default {
     name: 'QuizQuestion',
@@ -44,11 +46,15 @@ export default {
     methods: {
         selectAnswer( status ) { //salir del menu de pausa
             this.show = false;
-            //es la opcion correcta ?
-            // ...
-            console.log( status );
+
+            if ( status ) {
+                launchConfetti();
+            }
+            
             //volver al juego
-            this.$emit('closeQuiz');
+            var points = status ? 1 : 0;
+            var msg = { bonus: points };
+            this.$emit( 'closeQuiz', JSON.stringify( msg ) );
         },
         randomIntFromInterval(min, max) { // min and max included 
             return Math.floor(Math.random() * (max - min + 1) + min);

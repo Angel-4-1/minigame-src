@@ -30,7 +30,7 @@ export class Player {
         this.ability = new ABILITY.Ability();
         this.has_ability = true;
         this.particle_color = 'rgba(0, 0, 0,';
-        this.lives =  1;
+        this.lives =  200;
     }
 
     update(timestamp, gamespeed, frames_done) {
@@ -181,10 +181,14 @@ export class Player {
 
     updateLive( ) {
         this.lives--;
-        if ( this.lives < 0 ) {
+        if ( this.lives < 1 ) {
             return false;
         }
 
         return true;
+    }
+
+    increaseLive( ) {
+        this.lives++;
     }
 }

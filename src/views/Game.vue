@@ -8,12 +8,15 @@
         <div v-if="current_stage.id == my_stages.INTRO_STAGE"><IntroStage/></div>
         <div v-if="current_stage.id == my_stages.TUTORIAL_STAGE"><TutorialStage/></div>
         <div v-if="current_stage.id == my_stages.PLAY_STAGE">
-            <PlayStage
+            <PlayStage ref="playStage"
+                :prevCharacterID="prevCharacterID"
+                :prevLevelID="prevLevelID"
                 @gameIsOver="gameIsOver"/>
         </div>
         <div v-if="current_stage.id == my_stages.FINAL_STAGE">
             <FinalStage
-                :score_obtained="score_obtained"/>
+                :score_obtained="score_obtained"
+                @resetGame="resetGame"/>
         </div>
 
         <h1> ID: {{ current_stage.id }} Name: {{ current_stage.name }}</h1>
@@ -45,7 +48,9 @@ export default {
         return {
             change_state: false,
             my_stages: stages_constants, //copiar los STAGES en variable local
-            score_obtained: null
+            score_obtained: null,
+            prevCharacterID: -1,
+            prevLevelID: -1
         }
     },
     computed: {
@@ -91,6 +96,12 @@ export default {
         gameIsOver( data ) {
             this.score_obtained = data;
             this.changeState(this.my_stages.FINAL_STAGE);
+        },
+        resetGame( msg ) {
+            console.log( msg );
+            var data = JSON.parse( msg );
+            this.prevCharacterID = data.characterID;
+            this.prevLevelID = data.levelID;
         }
     }
 }

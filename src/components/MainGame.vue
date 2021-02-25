@@ -80,10 +80,11 @@ export default {
         isQuizTime() {
             return this.isQuiz;
         },
-        closeQuiz() {
+        closeQuiz( bonus ) {
             //sumar puntos si la respuesta es buena o guardarlos y al final se suman
             this.isQuiz = false;
             this.$refs.myCanvas.continueGame();
+            this.$refs.myCanvas.handleBonus( bonus );
         },
         openQuiz() {
             this.isQuiz = true;
@@ -94,7 +95,7 @@ export default {
         },
         quitGame() {
             this.isPaused = false;
-            console.log("QUIT GAME")
+            this.$refs.myCanvas.gameOver();
         }
     },
     created() {
@@ -110,9 +111,10 @@ export default {
 </script>
 
 <style scoped>
+
 .container {
     height: 100vh;
-    padding: 1vh;
+    /*padding: 1vh;*/
     /*width: calc(100% - 20px);*/
     /*min-height: calc(100vh - 20px);*/
     background: radial-gradient(#7a1599, #500a44);
