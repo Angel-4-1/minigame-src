@@ -12,7 +12,7 @@
         <div class="modal-content">
 
             <div class="modal-title">
-                <h1>{{ phrases.title }}</h1>
+                <h1>{{ title }}</h1>
             </div>
 
             <div class="modal-text">
@@ -21,7 +21,7 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn-modal-blink" @click="closePopUp">Close</button>
+                <button class="btn-modal-blink" @click="closePopUp">{{ btn_text }}</button>
             </div>
 
         </div>
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import { INSTRUCTOR } from '@/consts.js';
 
 export default {
@@ -44,8 +45,15 @@ export default {
             timer: null,
             text: '',
             stop: false,
-            speed: 60
+            speed: 60,
+            language_id: 0,
+            phrase: "",
+            title: "",
+            btn_text: "Close"
         }
+    },
+    computed: {
+        ...mapState( ['language'] )
     },
     methods: {
         closePopUp() {
@@ -59,8 +67,8 @@ export default {
                 var i = -1;
                 this.timer = setInterval( () => {
                     i++;
-                    const x = i % this.phrases.content.length;
-                    this.text += this.phrases.content[x];
+                    const x = i % this.phrase.length;
+                    this.text += this.phrase[x];
                 }, this.speed );
             }
         },
@@ -69,12 +77,23 @@ export default {
         }
     },
     mounted() {
+        this.language_id = this.language.id;
+        this.title = this.phrases.title[this.language_id]
+        this.phrase = this.phrases.content[this.language_id];
+        switch( this.language_id ) {
+            case 1:
+                this.btn_text = "Cerrar";
+                break;
+            default: 
+                this.btn_text = "Close";
+                break;
+        }
         this.printTypeWriter();
     },
     watch: {
         text: function() {
             //Parar cuando la variable text ya contenga todo el mensaje que queriamos mostrar
-            if ( this.text.length == this.phrases.content.length ) {
+            if ( this.text.length == this.phrase.length ) {
                 this.stop = true;
                 this.stopTypeWriter();
             }

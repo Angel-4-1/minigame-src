@@ -24,7 +24,7 @@
                     </div>
 
                     <div class="buttons">
-                        <button class="btn btn-accept" @click="characterIsSelected">SELECT</button>
+                        <button class="btn btn-accept" @click="characterIsSelected"> {{ btn_text }} </button>
                     </div>               
                 </div>
 
@@ -34,13 +34,13 @@
 
                     <div class="detail-content-back">
                         <div class="detail-properties">     
-                            <span class="header"><h3>Description</h3></span>
-                            <span class="data"><p>{{ character.data }}</p></span>
+                            <span class="header"><h3> {{ description }} </h3></span>
+                            <span class="data"><p>{{ character.data[language_id] }}</p></span>
                         </div>
                         
 
                         <div class="detail-abilities">
-                            <div class="header"><h3>Abilities</h3></div>
+                            <div class="header"><h3> {{ abilities }}</h3></div>
                             <div class="type"><span>{{ character.ability }}</span></div>
                         </div>
                         
@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
 import { CHARACTERS } from '@/consts.js';
 
 export default {
@@ -68,7 +69,11 @@ export default {
             show: false,
             character: null,
             flipped: false,
-            num: 0
+            num: 0,
+            language_id: 0,
+            btn_text: "SELECT",
+            description: "Description",
+            abilities: "Abilities"
         }
     },
     methods: {
@@ -106,8 +111,24 @@ export default {
             this.pickCharacter(newid);
         }
     }, 
+    computed: {
+        ...mapState( ['language'] )
+    },
     mounted() {
         this.flipped = false;
+        this.language_id = this.language.id;
+        switch( this.language_id ) {
+            case 1:
+                this.btn_text = "SELECCIONAR";
+                this.description = "Descripción";
+                this.abilities = "Habilidades";
+                break;
+            default: 
+                this.btn_text = "SELECT";
+                this.description = "Description";
+                this.abilities = "Abilities";
+                break;
+        }
     },
     created() {
         this.pickCharacter(this.$props.characterID);

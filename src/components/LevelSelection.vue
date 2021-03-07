@@ -28,8 +28,8 @@
               <img class="card-image" :src="require(`@/${levels[index+1].icon}`)" >
               <div class="card-content">
                 <!-- <h1 class="numbertext numbertext-right">{{ levels[index+1].id + 1 }} / {{ levels.length }}</h1> -->
-                <h1 class="card-header">{{ levels[index+1].name }}</h1>
-                <p class="card-text card-text-no-overflow">{{ levels[index+1].description }}</p>
+                <h1 class="card-header">{{ levels[index+1].name[language_id] }}</h1>
+                <p class="card-text card-text-no-overflow">{{ levels[index+1].description[language_id] }}</p>
               </div>
             </div>
             
@@ -39,8 +39,8 @@
               <img class="card-image" :src="require(`@/${levels[index-1].icon}`)" > <!--style="width:100%"-->
               <div class="card-content">
                 <!-- <h1 class="card-header">{{ levels[index-1].id + 1 }} / {{ levels.length }}</h1> -->
-                <h1 class="card-header">{{ levels[index-1].name }}</h1>
-                <p class="card-text card-text-no-overflow">{{ levels[index-1].description }}</p>
+                <h1 class="card-header">{{ levels[index-1].name[language_id] }}</h1>
+                <p class="card-text card-text-no-overflow">{{ levels[index-1].description[language_id] }}</p>
               </div>
             </div>
             
@@ -50,10 +50,10 @@
               <img class="card-image" :src="require(`@/${level.icon}`)" alt="Level image">
               <div class="card-content">
                 <!-- <h1 class="ca">{{ level.id + 1 }} / {{ levels.length }}</div> -->
-                <h1 class="card-header">{{ level.name }}</h1>
-                <p class="card-text">{{ level.description }}</p>
+                <h1 class="card-header">{{ level.name[language_id] }}</h1>
+                <p class="card-text">{{ level.description[language_id] }}</p>
               </div>
-              <button class="card-btn" @click="levelIsSelected(current_level)">SELECT</button>
+              <button class="card-btn" @click="levelIsSelected(current_level)"> {{ btn_text }} </button>
             </div>
             
             
@@ -104,11 +104,13 @@ export default {
         levels: LEVELS,
         bkClass: 'bk',
         blurClass: 'blur',
-        phraseID: 0
+        phraseID: 0,
+        language_id: 0,
+        btn_text: "SELECT"
       }
     },
     computed: {
-        ...mapState( ['stage'] )
+        ...mapState( ['stage' , 'language'] )
     },
     methods: {
       toggleModal() {
@@ -143,7 +145,16 @@ export default {
       }
     },
     mounted() {
+      this.language_id = this.language.id;
       this.isOpen = true;
+      switch( this.language_id ) {
+          case 1:
+              this.btn_text = "SELECCIONAR";
+              break;
+          default: 
+              this.btn_text = "SELECT";
+              break;
+      }
     },
     created() {
       this.current_level = 0;

@@ -8,52 +8,116 @@ export const STAGES = {
     FINAL_STAGE: 4
 };
 
+export const LANGUAGES =  [
+    { name: "English", id: 0 , screen_name : "English" , image: "assets/languages/english.png" },
+    { name: "Spanish", id: 1 , screen_name : "Español" , image: "assets/languages/spain.png" }
+];
+
 export const CHARACTERS = [
-    { name: "Basic boy"   , id: 0, icon: "assets/characters/boy_face.png"   , data: "This character represents that inexperienced user who enters a social media for the first time, so he does not have sufficient knowledge about what he should and should not publish on the network since he is unaware of the risks of publishing his private information to the outside world and the effects that this would mean" , has_ability: false, ability: "None" , sprite: "assets/characters/boy_spritesheet.png" , 
-    sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
-        [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-        [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-        [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-        [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-    ], map: [ 0 ] },
-    { name: "Basic Girl"  , id: 1, icon: "assets/characters/girl_face.png" , data: "Something" , has_ability: true, ability: "Froze" , sprite: "assets/characters/girl_spritesheet.png" , 
-    sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
-        [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-        [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-        [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-        [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-    ], map: [ 0, 1 ] },
-    { name: "Amateur" , id: 2, icon: "assets/characters/senior_face.png" , data: "Something" , has_ability: true, ability: "Darkness" , sprite: "assets/characters/senior_spritesheet.png" , 
-    sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
-        [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-        [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-        [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-        [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-    ], map: [ 0 ] },
-    { name: "Punky" , id: 3, icon: "assets/characters/punky_face.png"   , data: "Something" , has_ability: false, ability: "Run" , sprite: "assets/characters/punky_spritesheet.png" , 
-    sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
-        [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-        [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-        [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-        [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-    ], map: [ 0 ] },
-    { name: "Senior" , id: 4, icon: "assets/characters/gentleman_face.png" , data: "Something" , has_ability: false, ability: "Run" , sprite: "assets/characters/gentleman_spritesheet.png" , 
-    sprite_size_x: 128, sprite_size_y: 165 , frames: 4, animation: [ 
-        [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-        [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-        [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-        [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-    ], map: [ 0 ] },
-    { name: "Character 6" , id: 5, icon: "assets/characters/pig.png"   , data: "Something" , ability: "Run" , sprite: "assets/characters/spritesheet2.png"},
-    { name: "Character 7" , id: 6, icon: "assets/characters/pig.png"   , data: "Something" , ability: "Run" , sprite: "assets/characters/spritesheet2.png"},
-    { name: "Character 8" , id: 7, icon: "assets/characters/tiger.png" , data: "Something" , ability: "Run" , sprite: "assets/characters/spritesheet2.png"}
+    { name: "Basic boy" , id: 0, icon: "assets/characters/boy_face.png" , 
+        data: [ 
+            "This character represents that inexperienced user who enters a social media for the first time, so he does not have sufficient knowledge about what he should and should not publish on the network since he is unaware of the risks of publishing his private information to the outside world and the effects that this would mean",
+            "HOLA" 
+        ], 
+        has_ability: false, ability: "None" , sprite: "assets/characters/boy_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ], map: [ 0 ] 
+    },
+
+    { name: "Basic Girl" , id: 1, icon: "assets/characters/girl_face.png" , 
+        data: [
+            "Something",
+            "Algo"
+        ], 
+        has_ability: true, ability: "Froze" , sprite: "assets/characters/girl_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ], map: [ 0, 1 ] 
+    },
+    
+    { name: "Amateur" , id: 2, icon: "assets/characters/senior_face.png" , 
+        data: [
+            "Something",
+            "Algo"
+        ],
+        has_ability: true, ability: "Darkness" , sprite: "assets/characters/senior_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ], map: [ 0 ] 
+    },
+    
+    { name: "Punky" , id: 3, icon: "assets/characters/punky_face.png" , 
+        data: [
+            "Something",
+            "Algo"
+        ],
+        has_ability: false, ability: "Run" , sprite: "assets/characters/punky_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ], map: [ 0 ] 
+    },
+    
+    { name: "Senior" , id: 4, icon: "assets/characters/gentleman_face.png" , 
+        data: [
+            "Something",
+            "Algo"
+        ],
+        has_ability: false, ability: "Run" , sprite: "assets/characters/gentleman_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ], map: [ 0 ] 
+    },
+    
+    { name: "Character 6" , id: 5, icon: "assets/characters/pig.png"   , data: [ "Something", "Algo" ] , ability: "Run" , sprite: "assets/characters/spritesheet2.png"},
+    { name: "Character 7" , id: 6, icon: "assets/characters/pig.png"   , data: [ "Something", "Algo" ] , ability: "Run" , sprite: "assets/characters/spritesheet2.png"},
+    { name: "Character 8" , id: 7, icon: "assets/characters/tiger.png" , data: [ "Something", "Algo" ] , ability: "Run" , sprite: "assets/characters/spritesheet2.png"}
 ];
 
 export const LEVELS = [
-    { id: 0 , name: "LEVEL 1: CLASSIC" , description: "Learn the basics of the game by playing the classic version. Are you ready ? Let's start !" , isActive: true  , difficulty: "easy" , icon: "assets/levels/1.png" },
-    { id: 1 , name: "LEVEL 2: OSCILATING" , description: "The obstacles do not follow a straight line anymore" , isActive: false , difficulty: "medium" , icon: "assets/levels/2.png" },
-    { id: 2 , name: "LEVEL 3: BAD INFLUENCES" , description: "Some obstacles seem good for you but they are not. Do not trust anyone!" , isActive: false , difficulty: "hard" , icon: "assets/levels/3.png" },
-    { id: 2 , name: "LEVEL 4" , description: "Coming soon" , isActive: false , difficulty: "hard" , icon: "assets/levels/4.png" }
+    { id: 0 , name: [ "LEVEL 1: CLASSIC", "NIVEL 1: CLÁSICO" ] , 
+        description: [ 
+            "Learn the basics of the game by playing the classic version. Are you ready ? Let's start !", 
+            "Aprende los fundamentos del juego al jugar a la versión clásica. ¿ Estas preparado ? ¡ A por ello !"
+        ]
+        , isActive: true  , difficulty: "easy" , icon: "assets/levels/1.png" },
+    { id: 1 , name: [ "LEVEL 2: OSCILATING" , "NIVEL 2: OSCILANDO" ], 
+        description: [
+            "The obstacles do not follow a straight line anymore",
+            "Los obstáculos ya no siguen una linea recta"
+        ]
+        , isActive: false , difficulty: "medium" , icon: "assets/levels/2.png" },
+    { id: 2 , name: [ "LEVEL 3: BAD INFLUENCES", "NIVEL 3: MALAS INFLUENCIAS" ], 
+        description: [
+            "Some obstacles seem good for you but they are not. Do not trust anyone!",
+            "Algunos obstáculos parecen buenos pero no lo son. ¡No confies en nadie!"
+        ]
+        , isActive: false , difficulty: "hard" , icon: "assets/levels/3.png" },
+    { id: 2 , name: [ "LEVEL 4", "NIVEL 4" ], 
+        description: [ 
+            "Coming soon", 
+            "Próximamente"
+        ], isActive: false , difficulty: "hard" , icon: "assets/levels/4.png" }
 ];
 
 export const MAPS = [
@@ -63,8 +127,16 @@ export const MAPS = [
 
 export const INSTRUCTOR = [
     { id: 0, icon: "assets/characters/instructor_face.png" , phrases: [ 
-        { title: "WELCOME!", content: "It's time to start playing, but before you must choose a level"},    //Level Selection
-        { title: "OKAY THEN", content: "Now choose a character, but remember, each of them has unique abilities"}   //Character Selection
+        /* Level Selection */
+        { title: [ "WELCOME!", "BIENVENIDO!" ], content: [
+            "It's time to start playing, but before you must choose a level",
+            "Es hora de empezar a jugar, pero antes has de seleccionar un nivel"
+        ] },    
+        /* Character Selection */
+        { title: [ "OKAY THEN", "SIGAMOS" ], content: [
+            "Now choose a character, but remember, each of them has unique abilities",
+            "Ahora selecciona un personaje, pero recuerda, cada uno de ellos tiene habilidades únicas"
+        ] }   
     ]}
 ];
 

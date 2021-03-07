@@ -19,7 +19,7 @@ export default {
     name: 'IntroStage',
     data() {
         return {
-            destination: stages_constants.PLAY_STAGE,
+            destination: stages_constants.TUTORIAL_STAGE,
             id: stages_constants.INTRO_STAGE
         }
     },
