@@ -6,7 +6,7 @@
 
         <div v-if="current_stage.id == my_stages.STAGE"><Stage/></div>
         <div v-if="current_stage.id == my_stages.INTRO_STAGE"><IntroStage/></div>
-        <div v-if="current_stage.id == my_stages.TUTORIAL_STAGE"><TutorialStage/></div>
+        <div v-if="current_stage.id == my_stages.LANGUAGE_STAGE"><LanguageStage/></div>
         <div v-if="current_stage.id == my_stages.PLAY_STAGE">
             <PlayStage ref="playStage"
                 :prevCharacterID="prevCharacterID"
@@ -29,7 +29,7 @@
 <script>
 import Stage from './Stage'
 import IntroStage from './IntroStage.vue'
-import TutorialStage from './TutorialStage.vue'
+import LanguageStage from './LanguageStage.vue'
 import PlayStage from './PlayStage.vue'
 import FinalStage from './FinalStage.vue'
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
@@ -40,7 +40,7 @@ export default {
     components: {
         Stage,
         IntroStage,
-        TutorialStage,
+        LanguageStage,
         PlayStage,
         FinalStage,
     },

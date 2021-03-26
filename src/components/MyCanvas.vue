@@ -9,7 +9,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES, CHARACTERS, LEVELS, MAPS } from '@/consts.js';
+import { STAGES, CHARACTERS, LEVELS, MAPS, AUDIO_FILES } from '@/consts.js';
 import * as PLAYER from '../game/player.js';
 import * as BUTTON from '../game/button.js';
 import * as BACKGROUND from '../game/background.js';
@@ -58,15 +58,20 @@ export default {
             obs_minX: 999,
             explosions: [],
             explosion_imgs: [],
+            obs_sizeX: 250,
+            obs_sizeY: 225,
+            collision_audio_src: AUDIO_FILES.AUDIO_COLLISION,
 
             /**RESOURCES**/
             resources: [],
             resources_interval: 400,
             res_img: null,
+            resource_audio_src: AUDIO_FILES.AUDIO_RESOURCE,
 
             /**ABILITY**/
             ability: null,
             ability_isActive: false,
+            ability_quiz: false,
 
             /**NIVEL**/
             //level: LEVELS[ this.$props['levelID'] ],
@@ -137,7 +142,8 @@ export default {
             heart_img: null,
 
             /**AUDIO**/
-            pickResource: null
+            pickResource: null,
+            collisionSound: null
         }
     },
     methods: {
@@ -220,7 +226,7 @@ export default {
                     //SOLO DE PRUEBA --> llama al quiz
                     this.status = false;
                     document.dispatchEvent(this.pause_event);
-                    this.$emit('openQuiz');
+                    this.$emit('openQuiz', JSON.stringify( {ability: this.ability_quiz} ));
                     
                 } else if ( this.character.has_ability ) {
                     if ( this.ability_button.isHit(x,y) ) {
@@ -233,7 +239,7 @@ export default {
                                 break;
                             default:
                                 if (this.tileset_snow) { 
-                                    this.changeTileset( MAPS[ this.maps[0] ].tileset );
+                                    this.changeTileset( MAPS[ LEVELS[this.level].map ].tileset );
                                     this.tileset_snow = false;
                                     this.gamespeed = 4;
                                     this.isSnowing = false;
@@ -241,7 +247,8 @@ export default {
                                     this.color_header = "rgba(250, 200, 200, 1)";
                                     this.ability_button.active = false;
                                 } else {
-                                    this.changeTileset( MAPS[ this.maps[1] ].tileset );
+                                    var m = this.level == 2 ? 3 : 1;
+                                    this.changeTileset( MAPS[ m ].tileset );
                                     this.tileset_snow = true;
                                     this.gamespeed = 2;
                                     this.isSnowing = true;
@@ -365,14 +372,13 @@ export default {
                     continue;
                 }
 
-                if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.obstacles[i].x, this.obstacles[i].y, this.obstacles[i].width, this.obstacles[i].height, true ) && this.obstacles[i].isHit == false ) {
+                if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.obstacles[i].x, this.obstacles[i].y, this.obstacles[i].swidth, this.obstacles[i].sheight, true ) && this.obstacles[i].isHit == false ) {
                     this.collisions++;
                     this.obstacles[i].isHit = true;
                     this.obstacles[i].show = false;
-                    /*this.floatingMessages.push( 
-                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "-{&#10084;}", 20, 3 )
-                    );*/
+
                     var explosion_rnd = Math.floor(Math.random() * this.explosion_imgs.length);
+                    this.collisionSound.play();
                     this.explosions.push(
                         new EXPLOSION.Explosion( this.explosion_imgs[explosion_rnd], this.obstacles[i].x, this.obstacles[i].y, 250, 250, 250)
                     );
@@ -393,14 +399,11 @@ export default {
                 if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.resources[i].x, this.resources[i].y, this.resources[i].width, this.resources[i].height, true ) && this.resources[i].isHit == false ) {
                     this.resources[i].isHit = true;
                     this.pickResource.play();
-                    this.floatingMessages.push( 
-                        new FLOATINGMESSAGE.floatingMessage( this.player.pos.x, this.player.pos.y - 100, "RESOURCE", 20, 3 )
-                    );
                     
                     if ( this.resources[i].type == "QUIZ" ) {
                         this.status = false;
                         document.dispatchEvent(this.pause_event);
-                        this.$emit('openQuiz');
+                        this.$emit('openQuiz', JSON.stringify( {ability: this.ability_quiz} ));
                     } else if ( this.resources[i].type == "HEALTH" ) {
                         this.player.increaseLive();
                     }
@@ -432,7 +435,7 @@ export default {
 
                 if ( this.obstacles[i].y < this.obs_minY ) {
                     this.obs_minY = this.obstacles[i].y;
-                    //this.obs_minX = this.obstacles[i].x;
+                    this.obs_minX = this.obstacles[i].x;
                 }
                 
                 //Lo elimina pero produce un blink en la pantalla ya que se ha de rehacer el array
@@ -442,14 +445,26 @@ export default {
             }
 
             if ( this.total_frames % this.obstacles_interval == 0 ) {
-                var obs = OBSTACLE.createObstacle( this.obs_img, this.spawn_points, this.level, this.obs_minY, this.obs_minX );
+                var obs = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, this.obs_minY, this.obs_minX, false );
                 if ( obs != null ) {
                     this.obstacles.push( obs );
 
-                    if ( this.obstacles_interval > 50) { 
-                        this.obstacles_interval -= 50; 
+                    var rnd = Math.floor( Math.random() * 2)
+
+                    if ( this.levelID == 2 && rnd == 0 ){
+                        var x = obs.x;
+                        var y = obs.y;
+
+                        var obs2 = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, y, x, true );
+                        if ( obs2 != null ) {
+                            this.obstacles.push( obs2 );
+                        }
                     }
-                }         
+                }
+
+                if ( this.obstacles_interval > 50) { 
+                    this.obstacles_interval -= 50; 
+                }
             }
         },
         clearObstacles() {
@@ -589,7 +604,7 @@ export default {
             this.score = 0;
             this.collisions = 0;
             this.obstacles.length = 0;
-            this.obstacles = OBSTACLE.initObstacles( this.obs_img, this.obstacles, this.spawn_points); 
+            this.obstacles = OBSTACLE.initObstacles( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.obstacles, this.spawn_points); 
         },
         onResize() {
             if ( this.full_size ) {
@@ -728,6 +743,10 @@ export default {
                     console.log("Darkness ability");
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
                     break;
+                case "Quiz":
+                    ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+                    this.ability_quiz = true;
+                    break;
                 default:    //Snow
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
                     break;
@@ -792,13 +811,16 @@ export default {
         });
         
         /**AUDIO**/
-        this.pickResource = new Audio( require(`@/assets/audio/Item.ogg`));
-        this.pickResource.volume = 0.2;
+        this.pickResource = new Audio( require(`@/${this.resource_audio_src}`));
+        this.pickResource.volume = 0.1;
+        this.collisionSound = new Audio( require(`@/${this.collision_audio_src}`) );
+        this.collisionSound.volume = 0.1;
 
         /**MAPA**/
-        this.maps = this.character.map;
+        this.maps = LEVELS[this.level].map;
         this.current_map = MAPS[ this.maps[0] ].map;
         this.tileset = MAPS[ this.maps[0] ].tileset;
+
         
         var tileset_img = this.getImage( require(`@/${this.tileset}`) );
         tileset_img.addEventListener("load", function(event) { 
@@ -806,6 +828,15 @@ export default {
             console.log("TILESET LOADED");
             that.images_current++;
         });
+
+        if ( this.level == 2 ) {
+            this.spawn_points = {
+                total: 4,           //cuantos puntos de aparicion hay
+                points: [200, 400, 600, 800]
+            };
+            this.obs_sizeX = 160;
+            this.obs_sizeY = 130;
+        }
 
         /**SNOW**/
         this.isSnowing = this.current_map == 1 ? true : false;

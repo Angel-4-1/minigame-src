@@ -30,7 +30,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { INSTRUCTOR } from '@/consts.js';
+import { INSTRUCTOR, AUDIO_FILES } from '@/consts.js';
 
 export default {
     name: 'PopUp',
@@ -49,7 +49,9 @@ export default {
             language_id: 0,
             phrase: "",
             title: "",
-            btn_text: "Close"
+            btn_text: "Close",
+            BGaudio: null,
+            audio_src: AUDIO_FILES.AUDIO_WRITE
         }
     },
     computed: {
@@ -74,6 +76,10 @@ export default {
         },
         stopTypeWriter() {
             clearInterval( this.timer );
+        },
+        playSound() {
+            this.BGaudio.currentTime = 0;
+            this.BGaudio.play(); 
         }
     },
     mounted() {
@@ -88,6 +94,14 @@ export default {
                 this.btn_text = "Close";
                 break;
         }
+        
+        /**AUDIO**/
+        this.BGaudio = new Audio( require(`@/${this.audio_src}`));
+        this.BGaudio.volume = 0.5;
+        this.BGaudio.playbackRate = 0.9;
+        this.BGaudio.play();
+        this.BGaudio.addEventListener( 'ended', this.playSound );
+
         this.printTypeWriter();
     },
     watch: {
@@ -96,8 +110,13 @@ export default {
             if ( this.text.length == this.phrase.length ) {
                 this.stop = true;
                 this.stopTypeWriter();
+                this.BGaudio.pause();
+                this.BGaudio.currentTime = 0;
             }
         }
+    }, 
+    unmounted() {
+        this.BGaudio.removeEventListener( 'ended', this.playSound );
     }
 }
 </script>

@@ -155,6 +155,12 @@ export default {
               this.btn_text = "SELECT";
               break;
       }
+      this.current_level = 0;
+      for ( let i = 0; i < this.levels.length; i++ ) {
+        this.levels[i].isActive = false;
+      }
+
+      this.levels[this.current_level].isActive = true;
     },
     created() {
       this.current_level = 0;

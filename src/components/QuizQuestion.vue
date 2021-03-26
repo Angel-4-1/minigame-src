@@ -14,7 +14,7 @@
 
             <!-- Botones parte inferior -->
             <div class="quiz-buttons">
-                <button v-for="(answer, index) in questions[question_id].answers" :key="index" class="btn" @click="selectAnswer( answer.status )">
+                <button v-for="(answer, index) in questions[question_id].answers" :key="index" :class="[selected == index ? 'discard-btn' : 'btn' ]" @click="selectAnswer( answer.status )">
                     {{ answer.name }}
                 </button>
             </div>
@@ -34,13 +34,15 @@ export default {
     emits: [                //aquello que emitimos al padre
         'closeQuiz'
     ],    
-    props: [ 'isQuiz' ],
+    props: [ 'isQuiz', 'quizAbility' ],
     data() {
         return {
             show: this.$props['isQuiz'],
             questions: QUIZ_QUESTIONS,
             question_id: 0,
-            questions_array: []
+            questions_array: [],
+            ability: false,
+            selected: -1
         }
     },
     methods: {
@@ -70,6 +72,19 @@ export default {
                 array[i] = array[j];
                 array[j] = temp;
             }
+        }, 
+        randomlySelectFalseAnswer() {
+            var size = this.questions[this.question_id].answers.length;
+            this.selected = this.randomIntFromInterval(0 , size - 1 );
+            while( this.questions[this.question_id].answers[ this.selected ].status == true ) {
+                this.selected = this.randomIntFromInterval(0 , size - 1 );
+            }
+        }
+    },
+    mounted() {
+        this.ability = this.$props['quizAbility'];
+        if( this.ability ) {
+            this.randomlySelectFalseAnswer();
         }
     },
     created() {
@@ -158,6 +173,27 @@ h1 {
 
 .quiz-buttons .btn:hover {
     background: rgb(62, 138, 102);
+    color: white;
+}
+
+.discard-btn {
+    outline: none;
+    border: none;
+    border-radius: 20px;
+
+    color: #000;
+    cursor: pointer;
+    background: rgb(143, 146, 144);
+    cursor: pointer; 
+    border: 3px solid rgb(255, 255, 255);
+    font-size: 2.5vh;
+
+    font-family: 'Press Start 2P', sans-serif;
+    letter-spacing: 1px;
+}
+
+.quiz-buttons .discard-btn:hover {
+    background: rgb(110, 112, 110);
     color: white;
 }
 

@@ -85,7 +85,8 @@ export default {
         this.levelIsNotSelected = true;
 
         var prevC = this.$props['prevCharacterID'];
-        var prevL = this.$props['prevlevelID'];
+        var prevL = this.$props['prevLevelID'];
+
         if ( prevC != -1 && prevL != -1 ) {
             this.characterIsNotSelected = false;
             this.levelIsNotSelected = false;

@@ -3,9 +3,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
 <!--Otras letras: Wendy One, Acme, Coiny, Righteous, Lilita One-->
 
-<div v-bind:class="[isPaused || isQuiz ? blurClass : '', bkClass]">
+<transition name="fade">
+  <PopUp 
+    v-if="isOpen"
+    :phraseID="phraseID"
+    @closePopUp="closePopUp"/>
+</transition>
+
+<div v-bind:class="[isPaused || isQuiz || isOpen ? blurClass : '', bkClass]">
     <div class="container">
-        <MyCanvas ref="myCanvas"
+        <MyCanvas v-if="canStart()" ref="myCanvas"
             :characterID="characterID" 
             :levelID="levelID"
             @openPauseMenu="openPauseMenu"
@@ -25,6 +32,7 @@
 <transition name="zoom">
     <QuizQuestion v-if="isQuizTime()"
         :isQuiz="isQuiz"
+        :quizAbility="quizAbility"
         @closeQuiz="closeQuiz"/>
 </transition>
 
@@ -36,13 +44,15 @@ import { STAGES, CHARACTERS, LEVELS } from '@/consts.js';
 import MyCanvas from '@/components/MyCanvas.vue';
 import PauseMenu from '@/components/PauseMenu.vue';
 import QuizQuestion from '@/components/QuizQuestion.vue';
+import PopUp from '@/components/PopUp.vue';
 
 export default {
     name: 'MainGame',
     components: {
         MyCanvas,
         PauseMenu,
-        QuizQuestion
+        QuizQuestion,
+        PopUp
     },
     props: [
         'levelID',
@@ -51,11 +61,14 @@ export default {
     emits: ['gameIsOver'], //lo que esta emitiendo a otros componentes
     data() {
         return {
+            isOpen: true,
+            phraseID: 2,
             points: 0,
             level: LEVELS[ this.$props['levelID'] ],
             character: CHARACTERS[ this.$props['characterID'] ],
             isPaused: false,
             isQuiz: false,
+            quizAbility: false,
             bkClass: 'bk',
             blurClass: 'blur'
         }
@@ -86,7 +99,9 @@ export default {
             this.$refs.myCanvas.continueGame();
             this.$refs.myCanvas.handleBonus( bonus );
         },
-        openQuiz() {
+        openQuiz( data ) {
+            var mydata = JSON.parse( data );
+            this.quizAbility = mydata.ability;
             this.isQuiz = true;
         },
         resetGame() {
@@ -96,6 +111,15 @@ export default {
         quitGame() {
             this.isPaused = false;
             this.$refs.myCanvas.gameOver();
+        },
+        toggleModal() {
+            this.isOpen = !this.isOpen;
+        },
+        closePopUp() {
+            this.toggleModal();
+        },
+        canStart() {
+            return !this.isOpen;
         }
     },
     created() {

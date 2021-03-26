@@ -3,7 +3,7 @@
 export const STAGES = {
     STAGE: 0,
     INTRO_STAGE: 1,
-    TUTORIAL_STAGE: 2,
+    LANGUAGE_STAGE: 2,
     PLAY_STAGE: 3,
     FINAL_STAGE: 4
 };
@@ -26,7 +26,7 @@ export const CHARACTERS = [
             [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
             [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
             [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ], map: [ 0 ] 
+        ]
     },
 
     { name: "Basic Girl" , id: 1, icon: "assets/characters/girl_face.png" , 
@@ -41,22 +41,22 @@ export const CHARACTERS = [
             [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
             [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
             [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ], map: [ 0, 1 ] 
+        ]
     },
     
     { name: "Amateur" , id: 2, icon: "assets/characters/senior_face.png" , 
         data: [
-            "Something",
-            "Algo"
+            "This user posses the power of knowledge, it may help you during the quiz questions by discarding an answer",
+            "Este usuario posee el poder del concocimiente, quizas te ayudará durante las preguntas quiz descartando una de las respuestas"
         ],
-        has_ability: true, ability: "Darkness" , sprite: "assets/characters/senior_spritesheet.png" , 
+        has_ability: true, ability: "Quiz" , sprite: "assets/characters/senior_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
             [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
             [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
             [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ], map: [ 0 ] 
+        ]
     },
     
     { name: "Punky" , id: 3, icon: "assets/characters/punky_face.png" , 
@@ -64,14 +64,14 @@ export const CHARACTERS = [
             "Something",
             "Algo"
         ],
-        has_ability: false, ability: "Run" , sprite: "assets/characters/punky_spritesheet.png" , 
+        has_ability: true, ability: "Darkness" , sprite: "assets/characters/punky_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
             [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
             [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
             [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ], map: [ 0 ] 
+        ]
     },
     
     { name: "Senior" , id: 4, icon: "assets/characters/gentleman_face.png" , 
@@ -86,7 +86,7 @@ export const CHARACTERS = [
             [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
             [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
             [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ], map: [ 0 ] 
+        ] 
     },
     
     { name: "Character 6" , id: 5, icon: "assets/characters/pig.png"   , data: [ "Something", "Algo" ] , ability: "Run" , sprite: "assets/characters/spritesheet2.png"},
@@ -100,29 +100,46 @@ export const LEVELS = [
             "Learn the basics of the game by playing the classic version. Are you ready ? Let's start !", 
             "Aprende los fundamentos del juego al jugar a la versión clásica. ¿ Estas preparado ? ¡ A por ello !"
         ]
-        , isActive: true  , difficulty: "easy" , icon: "assets/levels/1.png" },
+        , isActive: true  , difficulty: "easy" , icon: "assets/levels/1.png" , map: [ 0 ] 
+    },
+
     { id: 1 , name: [ "LEVEL 2: OSCILATING" , "NIVEL 2: OSCILANDO" ], 
         description: [
             "The obstacles do not follow a straight line anymore",
             "Los obstáculos ya no siguen una linea recta"
         ]
-        , isActive: false , difficulty: "medium" , icon: "assets/levels/2.png" },
-    { id: 2 , name: [ "LEVEL 3: BAD INFLUENCES", "NIVEL 3: MALAS INFLUENCIAS" ], 
+        , isActive: false , difficulty: "medium" , icon: "assets/levels/2.png" , map: [ 0 ]
+    },
+
+    { id: 2 , name: [ "LEVEL 3: MORE OBSTACLES", "NIVEL 3: MÁS OBSTÁCULOS" ], 
+        description: [
+            "Now there are more obstacles!",
+            "Ahora hay más obstáculos!"
+        ]
+        , isActive: false , difficulty: "hard" , icon: "assets/levels/3.png" , map: [ 2 ]
+    },
+
+    { id: 3 , name: [ "LEVEL 4: BAD INFLUENCES", "NIVEL 4: MALAS INFLUENCIAS" ], 
         description: [
             "Some obstacles seem good for you but they are not. Do not trust anyone!",
             "Algunos obstáculos parecen buenos pero no lo son. ¡No confies en nadie!"
         ]
-        , isActive: false , difficulty: "hard" , icon: "assets/levels/3.png" },
-    { id: 2 , name: [ "LEVEL 4", "NIVEL 4" ], 
+        , isActive: false , difficulty: "hard" , icon: "assets/levels/3b.png" , map: [ 0 ]
+    },
+
+    { id: 4 , name: [ "LEVEL 5", "NIVEL 5" ], 
         description: [ 
             "Coming soon", 
             "Próximamente"
-        ], isActive: false , difficulty: "hard" , icon: "assets/levels/4.png" }
+        ], isActive: false , difficulty: "hard" , icon: "assets/levels/4.png" , map: [ 0 ]
+    }
 ];
 
 export const MAPS = [
     { id: 0, map : [1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 8, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 3, 3, 4, 3, 3, 4, 3, 3, 8], tileset: "assets/city_tileset.png" },
-    { id: 1, map : [1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 8, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 3, 3, 4, 3, 3, 4, 3, 3, 8], tileset: "assets/winter_city_tileset.png"  }
+    { id: 1, map : [1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 8, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 7, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 6, 5, 4, 6, 5, 4, 6, 5, 2, 1, 3, 3, 4, 3, 3, 4, 3, 3, 8], tileset: "assets/winter_city_tileset.png"  },
+    { id: 2, map : [1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 8, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 7, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 8, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 7, 6, 4, 3, 4, 3, 4, 3, 5, 2], tileset: "assets/city4_tileset.png"  },
+    { id: 3, map : [1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 8, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 7, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 1, 6, 4, 3, 4, 3, 4, 3, 5, 8, 1, 6, 4, 3, 4, 3, 4, 3, 5, 2, 7, 6, 4, 3, 4, 3, 4, 3, 5, 2], tileset: "assets/winter_city4_tileset.png"  }
 ]
 
 export const INSTRUCTOR = [
@@ -136,7 +153,12 @@ export const INSTRUCTOR = [
         { title: [ "OKAY THEN", "SIGAMOS" ], content: [
             "Now choose a character, but remember, each of them has unique abilities",
             "Ahora selecciona un personaje, pero recuerda, cada uno de ellos tiene habilidades únicas"
-        ] }   
+        ] },    
+        /* Main Game */
+        { title: [ "LET'S START", "EMPECEMOS" ], content: [
+            "Avoid as many obstacles as you can",
+            "Evita tantos obstáculos cómo puedas"
+        ] }
     ]}
 ];
 
@@ -154,5 +176,12 @@ export const QUIZ_QUESTIONS = [
         { name: "Answer False", status: false }
     ] }
 ];
+
+export const AUDIO_FILES = {
+    AUDIO_WRITE: 'assets/audio/Write.ogg',
+    AUDIO_RESOURCE: 'assets/audio/Item.ogg',
+    AUDIO_COLLISION: 'assets/audio/Blow.ogg',
+    AUDIO_GAMEOVER: 'assets/audio/Gameover1.ogg'
+};
 
 

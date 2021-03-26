@@ -8,7 +8,7 @@ export default createStore({
     stage: [
       { name: 'Stage',         id: stages_constants.STAGE,          change: false, change_to: 0 },
       { name: 'IntroStage',    id: stages_constants.INTRO_STAGE,    change: false, change_to: 0 },
-      { name: 'TutorialStage', id: stages_constants.TUTORIAL_STAGE, change: false, change_to: 0 },
+      { name: 'LanguageStage', id: stages_constants.LANGUAGE_STAGE, change: false, change_to: 0 },
       { name: 'PlayStage',     id: stages_constants.PLAY_STAGE,     change: false, change_to: 0 },
       { name: 'FinalStage',    id: stages_constants.FINAL_STAGE,    change: false, change_to: 0 }
     ],

@@ -45,7 +45,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants } from '@/consts.js';
+import { STAGES as stages_constants, AUDIO_FILES } from '@/consts.js';
 
 export default {
     name: 'FinalStage',
@@ -63,7 +63,8 @@ export default {
             time: 0,
             character_id: 0,
             level_id: 0,
-            BGaudio: null
+            BGaudio: null,
+            audio_src: AUDIO_FILES.AUDIO_GAMEOVER
         }
     },
     computed: {
@@ -100,7 +101,7 @@ export default {
         this.total_score = this.game_score + this.bonus_score;
 
         /**AUDIO**/
-        this.BGaudio = new Audio( require(`@/assets/audio/Gameover1.ogg`));
+        this.BGaudio = new Audio( require(`@/${this.audio_src}`));
         this.BGaudio.volume = 0.2;
         this.BGaudio.play();
         this.BGaudio.addEventListener( 'ended', this.playSound );
