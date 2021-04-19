@@ -53,13 +53,13 @@
                 <h1 class="card-header">{{ level.name[language_id] }}</h1>
                 <p class="card-text">{{ level.description[language_id] }}</p>
               </div>
-              <button class="card-btn" @click="levelIsSelected(current_level)"> {{ btn_text }} </button>
+              <button class="card-btn btn-pointer" @click="levelIsSelected(current_level)"> {{ buttons.BUTTON_SELECT[language_id] }} </button>
             </div>
             
             
             <!-- Botones para ir al nivel anterior o al siguiente -->
-            <a v-if="index > 0" class="btn-prev" @click="showNextLevel(-1, index)">&#10094;</a>
-            <a v-if="index < (levels.length - 1)" class="btn-next" @click="showNextLevel(1, index)">&#10095;</a>
+            <a v-if="index > 0" class="btn-prev btn-pointer" @click="showNextLevel(-1, index)">&#10094;</a>
+            <a v-if="index < (levels.length - 1)" class="btn-next btn-pointer" @click="showNextLevel(1, index)">&#10095;</a>
           </div>
 
         </div>  
@@ -70,10 +70,10 @@
         <span v-for="(level, index) in levels" :key="index" style="text-align:center">
           <!-- Circulo del nivel activo sera distinto al resto -->
           <span v-if="level.isActive">
-            <span class="dot dot-active" @click="showLevel(index)"></span>
+            <span class="dot dot-active btn-pointer" @click="showLevel(index)"></span>
           </span>
           <span v-else>
-            <span class="dot" @click="showLevel(index)"></span>
+            <span class="dot btn-pointer" @click="showLevel(index)"></span>
           </span>
         </span>
       </div>
@@ -86,7 +86,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants, LEVELS, INSTRUCTOR } from '@/consts.js';
+import { STAGES as stages_constants, LEVELS, BUTTONS } from '@/consts.js';
 import PopUp from '@/components/PopUp.vue';
 
 export default {
@@ -106,11 +106,11 @@ export default {
         blurClass: 'blur',
         phraseID: 0,
         language_id: 0,
-        btn_text: "SELECT"
+        buttons: BUTTONS
       }
     },
     computed: {
-        ...mapState( ['stage' , 'language'] )
+        ...mapState( ['stage' , 'language', 'enablePopUp'] )
     },
     methods: {
       toggleModal() {
@@ -146,15 +146,7 @@ export default {
     },
     mounted() {
       this.language_id = this.language.id;
-      this.isOpen = true;
-      switch( this.language_id ) {
-          case 1:
-              this.btn_text = "SELECCIONAR";
-              break;
-          default: 
-              this.btn_text = "SELECT";
-              break;
-      }
+      this.isOpen = this.enablePopUp;
       this.current_level = 0;
       for ( let i = 0; i < this.levels.length; i++ ) {
         this.levels[i].isActive = false;
@@ -212,7 +204,10 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: radial-gradient(#21dd6f, #157986);
+  background: url('~@/assets/BG_character.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
 }
 
 h1 {
@@ -333,6 +328,7 @@ h1 {
 
 .card-btn:hover, .card-btn:active {
   background-color: #9baceb;
+  /* box-shadow: 0 0 2em rgba(0, 223, 252, 0.4); */
 }
 
 .card-btn:hover span, .card-btn:active span {

@@ -25,20 +25,37 @@
             <path d="M673.5 193V163H663.5V153H653.5V123H673.5V153H693.5V123H713.5V153H703.5V163H693.5V193H673.5Z" stroke="black" stroke-width="5"/>
         </svg>
 
-        <button class="btn-start blinking" @click="changeState(destination)">START</button>
+        <button class="btn-start blinking btn-pointer" @click="changeState(destination)">START</button>
+    
+        <div class="container-running">
+        <div class="infinite">
+            <div class="character"></div>
+
+            <div class="obstacle"></div>
+
+            <!--
+            <div class="shadow"></div>
+            -->
+        </div>
     </div>
+    </div>
+
+
+
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
-import { STAGES as stages_constants } from '@/consts.js';
+import { mapState } from 'vuex';
+import { STAGES as stages_constants, AUDIO_FILES } from '@/consts.js';
 
 export default {
     name: 'IntroStage',
     data() {
         return {
             destination: stages_constants.LANGUAGE_STAGE,
-            id: stages_constants.INTRO_STAGE
+            id: stages_constants.INTRO_STAGE,
+            BGaudio: null,
+            audio_src: AUDIO_FILES.AUDIO_INTRO
         }
     },
     computed: {
@@ -47,15 +64,23 @@ export default {
     methods: {
         changeState(mydestination) {
             this.$store.commit('changeState', { index: this.id, destination: mydestination})
+        },
+        playSound() {
+            this.BGaudio.currentTime = 0;
+            this.BGaudio.play(); 
         }
-    }, mounted() {
-        /*
-        const logo = document.querySelectorAll("#logo path");
-
-        for ( let i = 0; i < logo.length; i++ ) {
-            console.log(`Letter ${i} is ${logo[i].getTotalLength()}`);
-        }
-        */
+    }, 
+    mounted() {
+        /**AUDIO**/
+        this.BGaudio = new Audio( require(`@/${this.audio_src}`));
+        this.BGaudio.volume = 0.2;
+        this.BGaudio.play();
+        this.BGaudio.addEventListener( 'ended', this.playSound );
+    },
+    unmounted() {
+        this.BGaudio.pause();
+        this.BGaudio.currentTime = 0;
+        this.BGaudio.removeEventListener( 'ended', this.playSound );
     }
 }
 </script>
@@ -69,7 +94,10 @@ export default {
     position: relative;
     align-content: center;
     padding: 10px;
-    background: #f88f8f;
+    background: url('~@/assets/BG_intro.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
     height: 100vh;
     /* font-family: 'Carter One', arial; */
 }
@@ -109,7 +137,7 @@ export default {
     left: 50%;
     /*colocarlo bien*/
     transform: translate(-50%, -50%);
-    bottom: 20%;
+    bottom: 15%;
 
     background: none;
     border: none;
@@ -140,7 +168,7 @@ export default {
 #logo {
     position: absolute;
     left: 50%;
-    top: 35%;
+    top: 20%;
     transform: translate(-50%,-50%);
     animation: fill-anim 0.5s ease forwards 6.4s;
     width: 80vw;
@@ -264,4 +292,126 @@ export default {
         fill: black;
     }
 }
+
+
+.container-running {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: relative;
+}
+
+.infinite {
+    position: relative;
+    width: min(80vw, 750px);
+    height: 20vh;
+    background-color: #686767;
+    transform-style: preserve-3d;
+    transform: perspective(500px) rotateX(30deg);
+}
+
+.infinite::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: min(10px, 10%);
+    background: linear-gradient(90deg, #fff 0%, #fff 70%, #686767 70%, #686767 100%);
+    background-size: 20%;
+    animation: animateRoad 5s linear infinite;
+}
+
+@keyframes animateRoad {
+    0%{
+        background-position: 0px;
+    }
+    100% {
+        background-position: -50%;
+    }
+}
+
+.infinite::after {
+    content: '';
+    position: absolute;
+    width: 98.3%;
+    height: 20px;
+    background: #333;
+    top: 100%;
+    left: 0.8%;
+    transform: perspective(600px) rotateX(-25deg);
+    -webkit-box-reflect: below 0px linear-gradient(transparent, #0005);
+}
+
+.shadow {
+    position: absolute;
+    bottom: -92px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    height: 60px;
+    background: linear-gradient(#000, transparent);
+    opacity: 0.5s;
+}
+
+.character {
+    position: fixed;
+    width: 128px;
+    height: 165px;
+    background: url('~@/assets/intro_character.png');
+    image-rendering: pixelated;
+    
+    transform: perspective(500px) rotateX(-25deg) translateY(-80px);
+    -webkit-box-reflect: below 1px linear-gradient(transparent, #0003);
+    animation: animateCharacter 1s steps(4) infinite;
+}
+
+@keyframes animateCharacter {
+    from {
+        background-position: 0;
+    }
+    to {
+        background-position: 512px;
+    }
+}
+
+.obstacle {
+    position: relative;
+    width: 20vw;
+    height: 20vw;
+    max-width: 100px;
+    max-height: 100px;
+    background: url('~@/assets/id.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    left: 84%;
+    transform: perspective(500px) rotateX(-25deg) translateY(-60%);
+
+    animation: animateObstacle 11s linear infinite;
+    -webkit-box-reflect: below 1px linear-gradient(transparent, #0003);
+}
+
+@keyframes animateObstacle {
+    0% {
+        left: 84%;
+        opacity: 0;
+    }
+    5%, 94% {
+        opacity: 1;
+    }
+    97% {
+        opacity: 0;
+    }
+    100% {
+        left: 0;
+        opacity: 0;
+    }
+}
+
+
 </style>

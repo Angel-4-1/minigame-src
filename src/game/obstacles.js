@@ -3,18 +3,18 @@ import * as UTILS from '../game/utils.js';
 export class Obstacle {
     constructor(_sprite, _x, _y, _width, _height, _speed, _type, _spawn_points, _spx = 345, _level = 0) {
         this.sprite = _sprite;
-        this.x = _x;            //Posicion
+        this.x = _x;                //Posicion
         this.y = _y;            
-        this.width = 250;    //Dimensiones
+        this.width = 250;           //Dimensiones
         this.height = 225;
-        this.swidth = _width;    //Dimensiones canvas
+        this.swidth = _width;       //Dimensiones canvas
         this.sheight = _height;
-        this.speed = _speed;    //Velocidad
-        this.type = _type.type;      //Tipo de obstaculo
+        this.speed = _speed;        //Velocidad
+        this.type = _type.type;     //Tipo de obstaculo
         this.spawn_points = _spawn_points;
         this.isHit = false;
         this.sx = _type.x;
-        this.isEnd = false; //needs to be destroyed
+        this.isEnd = false;         //needs to be destroyed
         this.show = true;
         this.t = 0;
         this.spx = _spx;
@@ -36,7 +36,7 @@ export class Obstacle {
 
         if ( this.level == 1 ) {
             this.t += 0.5 * gamespeed * elapsed_time;
-            this.x = this.spx + ( Math.sin( this.t ) * 150 );
+            this.x = this.spx + ( Math.sin( this.t + this.sx ) * 150 );
         }
         
         if ( this.y > canvas.height + this.height) {
@@ -149,5 +149,7 @@ const OBS_TYPE = [
     { type: "PASSWORD"   , x: 250  , y: 0 },
     { type: "HOME"       , x: 500  , y: 0 },
     { type: "CREDITCARD" , x: 750  , y: 0 },
-    { type: "BANKDATA"   , x: 1000 , y: 0 }
+    { type: "BANKDATA"   , x: 1000 , y: 0 },
+    { type: "HOLIDAY"    , x: 1250 , y: 0 },
+    { type: "PHONE"      , x: 1500 , y: 0 }
 ]

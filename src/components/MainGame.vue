@@ -74,7 +74,7 @@ export default {
         }
     },
     computed: {
-        ...mapState( ['stage'] )
+        ...mapState( ['stage', 'enablePopUp'] )
     },
     methods: {
         gameOver( data ) {
@@ -126,7 +126,7 @@ export default {
         this.isPaused = false;
     },
     mounted() {
-                
+        this.isOpen = this.enablePopUp;
     },
     beforeUnmount() { 
         
@@ -141,7 +141,10 @@ export default {
     /*padding: 1vh;*/
     /*width: calc(100% - 20px);*/
     /*min-height: calc(100vh - 20px);*/
-    background: radial-gradient(#7a1599, #500a44);
+    background: url('~@/assets/BG_maingame.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
     font-family: 'Carter One', arial;
     font-size: 1rem;
     font-weight: normal;

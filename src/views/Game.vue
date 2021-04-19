@@ -54,7 +54,7 @@ export default {
         }
     },
     computed: {
-        ...mapState( ['stage', 'current_stage'] )
+        ...mapState( ['stage', 'current_stage', 'local_standings'] )
     },
     methods: {
         changeState( isNext ) {
@@ -98,14 +98,31 @@ export default {
             this.changeState(this.my_stages.FINAL_STAGE);
         },
         resetGame( msg ) {
-            console.log( msg );
+            // console.log( msg );
             var data = JSON.parse( msg );
             this.prevCharacterID = data.characterID;
             this.prevLevelID = data.levelID;
         }
+    }, 
+    mounted() {
+        var datosDB = JSON.parse(localStorage.getItem('local-standings'));
+        if ( datosDB != null && datosDB.length != 0 ) {
+            this.$store.commit('updateLocalStandings', datosDB );
+        }
     }
 }
 </script>
+
+
+<style>
+* {
+    cursor: url('~@/assets/cursors/cursor.png'), auto;	
+}
+
+.btn-pointer:hover {
+    cursor: url('~@/assets/cursors/cursor-click.png'), pointer;
+}
+</style>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
@@ -131,6 +148,6 @@ a {
     position: fixed;
     top: 0;
     left: 0;
-    background: radial-gradient(#91d0ee, #1f466b);
+    /* background: radial-gradient(#91d0ee, #1f466b); */
 }
 </style>

@@ -8,34 +8,60 @@
         <div class="board-menu">
 
             <div class="board-header">
-                <h1>GAME OVER</h1>
+                <span class="header-empty"></span>
+                <span class="header-title">
+                    <h1 v-if="showResults">{{ titles.TITLE_GAMEOVER[language_id] }}</h1>
+                    <h1 v-else>{{ titles.TITLE_GAMEOVER_STANDINGS[language_id] }}</h1>
+                </span>
+                <button class="header-btn btn-pointer" :style="{ backgroundImage: 'url(' + require(`@/assets/podium.png`) + ')' }" @click="renderStandings"></button>
             </div>
 
-            <div class="board-content">
+            <div class="board-content" v-if="showResults">
                 <div class="property time">
-                    <span class="left"><h2>Time: </h2></span>
+                    <span class="left"><h2>{{ titles.TITLE_GAMEOVER_TIME[language_id] }}: </h2></span>
                     <span class="right"><h2>{{ time }}</h2></span>
                 </div> 
 
                 <div class="property score">
-                    <span class="left"><h2>Score: </h2></span>
+                    <span class="left"><h2>{{ titles.TITLE_GAMEOVER_POINTS[language_id] }}: </h2></span>
                     <span class="right"><h2>{{ game_score }}</h2></span>
                 </div>
                 <div class="property bonus-score">
-                    <span class="left"><h2>Bonus:</h2></span>
+                    <span class="left"><h2>{{ titles.TITLE_GAMEOVER_BONUS[language_id] }}:</h2></span>
                     <span class="right"><h2>{{ bonus_score }}</h2></span>
                 </div>
 
                 <div class="property total-score">
-                    <span class="left"><h2>Total Score: </h2></span>
+                    <span class="left"><h2>{{ titles.TITLE_GAMEOVER_TOTAL[language_id] }}: </h2></span>
                     <span class="right"><h2>{{ total_score }}</h2></span>
                 </div>           
+            </div>
+            <div class="board-standings" v-else>
+                <div v-for="(stand, index) in standings" :key="index" v-bind:class="[standings_player_pos == index ? 'standing player' : 'standing']">
+                    <span class="standing-points">
+                        <h3>{{stand.points}}</h3>
+                    </span>
+
+                    <span class="standing-pos gold" v-if="stand.pos == 1">
+                        <h3>{{stand.pos}}</h3>
+                    </span>
+                    <span class="standing-pos silver" v-else-if="stand.pos == 2">
+                        <h3>{{stand.pos}}</h3>
+                    </span>
+                    <span class="standing-pos bronze" v-else-if="stand.pos == 3">
+                        <h3>{{stand.pos}}</h3>
+                    </span>
+                    <span class="standing-pos" v-else>
+                        <h3>{{stand.pos}}</h3>
+                    </span>
+                </div>
+                
             </div>
 
             <!-- Botones parte inferior -->
             <div class="board-buttons">
-                <button class="btn" @click="reset">RESET</button>
-                <button class="btn" @click="goHome">HOME</button>
+                <button class="btn btn-pointer" @click="reset">{{ buttons.BUTTON_GAMEOVER_RESET[language_id] }}</button>
+                <button class="btn btn-pointer" @click="goHome">{{ buttons.BUTTON_GAMEOVER_HOME[language_id] }}</button>
             </div>
             
         </div>
@@ -44,8 +70,8 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants, AUDIO_FILES } from '@/consts.js';
+import { mapState } from 'vuex';
+import { STAGES as stages_constants, AUDIO_FILES, TITLES, BUTTONS } from '@/consts.js';
 
 export default {
     name: 'FinalStage',
@@ -63,12 +89,18 @@ export default {
             time: 0,
             character_id: 0,
             level_id: 0,
+            language_id: 0,
+            buttons: BUTTONS,
+            titles: TITLES,
             BGaudio: null,
-            audio_src: AUDIO_FILES.AUDIO_GAMEOVER
+            audio_src: AUDIO_FILES.AUDIO_GAMEOVER,
+            standings: null,
+            showResults: true,
+            standings_player_pos: -1
         }
     },
     computed: {
-        ...mapState( ['stage'] )
+        ...mapState( ['stage' , 'language', 'local_standings'] )
     },
     methods: {
         changeState(mydestination) {
@@ -87,11 +119,39 @@ export default {
         playSound() {
             this.BGaudio.currentTime = 0;
             this.BGaudio.play(); 
+        },
+        renderStandings() {
+            this.showResults = !this.showResults;
+        },
+        // Guardar en el local storage
+        saveStandings() {
+            this.local_standings[ this.level_id ].standings = this.standings;
+            localStorage.setItem( 'local-standings', JSON.stringify( this.local_standings ) );
+        },
+        updateStandings() {
+            var max_index = -1;
+            for( var i = this.standings.length-1; i >= 0; i-- ) {
+                if( this.total_score > this.standings[i].points ) {
+                    max_index = i;
+                }
+            }
+
+            if( max_index != -1 ) {
+                this.standings.splice( max_index, 0, { pos: max_index, points: this.total_score } );
+
+                for ( var i = 0; i < this.standings.length; i++ ) {
+                    this.standings[i].pos = i + 1;
+                }
+
+                this.standings = this.standings.slice( 0, 5 );
+            }
+
+            this.standings_player_pos = max_index;
         }
     },
     mounted() {
         //this.$props['score_obtained'] = { score: integer, bonus: integer, character: integer, level: integer, time: integer }
-        console.log( this.$props['score_obtained'] );
+        //console.log( this.$props['score_obtained'] );
         var data = JSON.parse( this.$props['score_obtained'] );
         this.game_score = data.score;
         this.bonus_score = data.bonus;
@@ -100,23 +160,38 @@ export default {
         this.level_id = data.level;
         this.total_score = this.game_score + this.bonus_score;
 
+        this.language_id = this.language.id;
+
+        /**Disable PopUp**/
+        this.$store.commit('changeEnablePopUp');
+
         /**AUDIO**/
         this.BGaudio = new Audio( require(`@/${this.audio_src}`));
         this.BGaudio.volume = 0.2;
         this.BGaudio.play();
         this.BGaudio.addEventListener( 'ended', this.playSound );
+
+        // Extraemos datos de los resultados anteriores (previamente guardados en la store)
+        this.standings = this.local_standings[ this.level_id ].standings;
+        
+        this.updateStandings();
+        this.showResults = true;
     },
     unmounted() {
         this.BGaudio.pause();
         this.BGaudio.currentTime = 0;
         this.BGaudio.removeEventListener( 'ended', this.playSound );
+        this.saveStandings();
     }
 }
 </script>
 
 <style scoped>
 .finalstage-container {
-    background: #ab8ff8;
+    background: url('~@/assets/BG_gameover.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
     font-family: 'Press Start 2P', arial;
     display: flex;
     justify-content: center;
@@ -162,7 +237,45 @@ h2 {
 
 .board-header {
     grid-area: header;
+
+    display: grid;
+    grid-template-columns: 19% 60% 19%;
+    grid-template-areas: 
+        "h-empty h-title h-btn";
+    grid-column-gap: 1%;
 }
+
+.header-empty {
+    grid-area: h-empty;
+}
+
+.header-title {
+    grid-area: h-title;    
+}
+
+.header-title h1 {
+    font-size: min(5.5vw, 35px);
+}
+
+.header-btn {
+    grid-area: h-btn;
+
+    outline: none;
+    border: none;
+    border-radius: 20px;
+    color: #000;
+    background: rgb(255, 255, 255, 0);
+    font-size: 2vh;
+    font-family: 'Press Start 2P', sans-serif;
+    letter-spacing: 1px;
+    background-size: cover;
+    background-position: center center;
+}
+
+.header-btn:hover {
+    opacity: 0.6;
+}
+
 
 /*CONTENT*/
 .board-content {
@@ -221,6 +334,60 @@ h2 {
     text-align: right;
 }
 
+/**STANDINGS**/
+.board-standings {
+    grid-area: content;
+    display: grid;
+    grid-template-rows: auto;
+    grid-row-gap: 10px;
+    overflow-y: auto;
+}
+
+.standing {
+    display: grid;
+    grid-template-columns: 24% 74%;
+    grid-template-areas: "pos points";
+    grid-column-gap: 2%;
+    width: 70%;
+    justify-self: center;
+    /* border: 2px solid black; */
+    border-radius: 7px;
+    background: rgb(255, 254, 196);
+}
+
+.player {
+    background: rgb(137, 214, 144);
+}
+
+.standing-pos {
+    grid-area: pos;
+}
+
+.gold {
+    background: rgb(230, 228, 131);
+    border-radius: 7px;
+    /* border: 5px solid black; */
+    box-shadow: 0px 0px 4px 5px rgb(180, 147, 54) inset;
+}
+
+.silver {
+    background: rgb(160, 154, 154);
+    box-shadow: 0px 0px 4px 5px rgb(88, 88, 87) inset;
+    border-radius: 7px;
+}
+
+.bronze {
+    background: rgb(165, 120, 90);
+    box-shadow: 0px 0px 4px 5px rgb(105, 75, 55) inset;
+    border-radius: 7px;
+}
+
+.standing-points {
+    grid-area: points;
+    text-align: right;
+    padding-right: 10%;
+}
+
 /*BOTONES*/
 .board-buttons {
     grid-area: buttons;
@@ -235,15 +402,10 @@ h2 {
     outline: none;
     border: none;
     border-radius: 20px;
-
     color: #000;
-    cursor: pointer;
-
     background: rgb(113, 235, 178);
-    cursor: pointer; 
     border: 3px solid rgb(255, 255, 255);
     font-size: 2vh;
-
     font-family: 'Press Start 2P', sans-serif;
     letter-spacing: 1px;
 }

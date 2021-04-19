@@ -14,7 +14,14 @@ export default createStore({
     ],
     current_stage: { name: 'IntroStage', id: 1 },
     languages: languages_constants,
-    language: { name: "English", id: 0 }
+    language: { name: "English", id: 0 },
+    enablePopUp: true,
+    local_standings: [ 
+      { level: 0, standings: [ { pos: 1 , points: 0 }, { pos: 2 , points: 0 }, { pos: 3 , points: 0 }, { pos: 4 , points: 0 }, { pos: 5 , points: 0 } ] }, 
+      { level: 1, standings: [ { pos: 1 , points: 0 }, { pos: 2 , points: 0 }, { pos: 3 , points: 0 }, { pos: 4 , points: 0 }, { pos: 5 , points: 0 } ] }, 
+      { level: 2, standings: [ { pos: 1 , points: 0 }, { pos: 2 , points: 0 }, { pos: 3 , points: 0 }, { pos: 4 , points: 0 }, { pos: 5 , points: 0 } ] }, 
+      { level: 3, standings: [ { pos: 1 , points: 0 }, { pos: 2 , points: 0 }, { pos: 3 , points: 0 }, { pos: 4 , points: 0 }, { pos: 5 , points: 0 } ] }
+    ]
   },
   mutations: {
     changeState( state, payload ) {
@@ -32,6 +39,12 @@ export default createStore({
           break;
         }
       }
+    },
+    changeEnablePopUp( state ) {
+      state.enablePopUp = false;
+    },
+    updateLocalStandings( state, payload ) {
+      state.local_standings = payload;
     }
   },
   actions: {

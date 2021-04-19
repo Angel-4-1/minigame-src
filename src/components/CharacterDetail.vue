@@ -6,8 +6,8 @@
             <transition name="flip">
 
                 <div v-if="flipped == false" class="card">
-                    <span @click="closeDetail" class="close-card">X</span>
-                    <span @click="toggleCard()" class="toggle-card">I</span>
+                    <span @click="closeDetail" class="close-card btn-pointer">X</span>
+                    <span @click="toggleCard()" class="toggle-card btn-pointer">I</span>
                     
                     <div class="detail-header">
                         <span class="header-title"><h2>{{ character.name }}</h2></span>
@@ -15,33 +15,33 @@
 
                     <div class="detail-content-front">
                         <span class="btn-left">
-                            <button class="btn" @click="changeView(false)"><a>&#10094;</a></button>
+                            <button class="btn" @click="changeView(false)"><a class="btn-pointer">&#10094;</a></button>
                         </span>
                         <span class="sprite-image" :style="{ background: `url(${require(`@/${character.sprite}`)}) 256px ${num}px` }"></span>
                         <span class="btn-right">
-                            <button class="btn" @click="changeView(true)"><a>&#10095;</a></button>
+                            <button class="btn" @click="changeView(true)"><a class="btn-pointer">&#10095;</a></button>
                         </span>
                     </div>
 
                     <div class="buttons">
-                        <button class="btn btn-accept" @click="characterIsSelected"> {{ btn_text }} </button>
+                        <button class="btn btn-accept btn-pointer" @click="characterIsSelected"> {{ buttons.BUTTON_SELECT[language_id] }} </button>
                     </div>               
                 </div>
 
                 <div v-else class="card card-back">
-                    <span @click="closeDetail" class="close-card">X</span>
-                    <span @click="toggleCard(card)" class="toggle-card">I</span>
+                    <span @click="closeDetail" class="close-card btn-pointer">X</span>
+                    <span @click="toggleCard(card)" class="toggle-card btn-pointer">I</span>
 
                     <div class="detail-content-back">
                         <div class="detail-properties">     
-                            <span class="header"><h3> {{ description }} </h3></span>
+                            <span class="header"><h3>{{ titles.TITLE_CHARACTER_DESCRIPTION[language_id] }} </h3></span>
                             <span class="data"><p>{{ character.data[language_id] }}</p></span>
                         </div>
                         
 
                         <div class="detail-abilities">
-                            <div class="header"><h3> {{ abilities }}</h3></div>
-                            <div class="type"><span>{{ character.ability }}</span></div>
+                            <div class="header"><h3>{{ titles.TITLE_CHARACTER_ABILITY[language_id] }}</h3></div>
+                            <div class="type"><span>{{ character.ability[language_id] }}</span></div>
                         </div>
                         
                     </div>
@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import { CHARACTERS } from '@/consts.js';
+import { mapState } from 'vuex';
+import { CHARACTERS, BUTTONS, TITLES } from '@/consts.js';
 
 export default {
     name: 'CharacterDetail',
@@ -71,9 +71,8 @@ export default {
             flipped: false,
             num: 0,
             language_id: 0,
-            btn_text: "SELECT",
-            description: "Description",
-            abilities: "Abilities"
+            buttons: BUTTONS,
+            titles: TITLES
         }
     },
     methods: {
@@ -117,18 +116,6 @@ export default {
     mounted() {
         this.flipped = false;
         this.language_id = this.language.id;
-        switch( this.language_id ) {
-            case 1:
-                this.btn_text = "SELECCIONAR";
-                this.description = "Descripción";
-                this.abilities = "Habilidades";
-                break;
-            default: 
-                this.btn_text = "SELECT";
-                this.description = "Description";
-                this.abilities = "Abilities";
-                break;
-        }
     },
     created() {
         this.pickCharacter(this.$props.characterID);
@@ -198,7 +185,7 @@ h3 {
 .btn a:hover {
     font-size: 4vh;
     font-weight: bold;
-    cursor: pointer;
+    /* cursor: pointer; */
     color:rgb(71, 69, 69);
     font-size: 5vh;
 }
@@ -256,6 +243,10 @@ h3 {
     overflow-y: auto;
 }
 
+.detail-properties .data p {
+    margin: 0;
+}
+
 .detail-abilities {
     grid-area: abilities;
     display: grid;
@@ -289,8 +280,6 @@ h3 {
 }
 
 
-
-
 /*BOTONES*/
 .detail .buttons {
     grid-area: buttons;
@@ -306,16 +295,12 @@ h3 {
     border-radius: 10px;
 
     color: #000;
-    cursor: pointer;
+    /* cursor: pointer; */
 
-    background: rgb(113, 235, 178);
-    cursor: pointer; 
-    
+    background: rgb(113, 235, 178);   
     font-size: 2vh;
-
     font-family: 'Press Start 2P', sans-serif;
     letter-spacing: 1px;
-
     width: 100%;
     height: 100%;
 }
@@ -323,9 +308,6 @@ h3 {
 
 /*BOTON PARA ACEPTAR*/
 .detail .buttons .btn-accept {
-    /*background-image: url('../assets/check.png');
-    background-size: cover;
-    grid-area: btnright;*/
     border: 3px solid rgb(145, 226, 138);
 }
 
@@ -338,9 +320,6 @@ h3 {
     opacity: 0.5;
     border: 3px solid rgb(0, 255, 0);
 }
-
-
-
 
 .card {
     background-color: #ffffff;

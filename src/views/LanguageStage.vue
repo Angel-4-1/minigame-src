@@ -6,14 +6,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
         <div class="panel">
-            <!--
-                <div class="title">
-                    <h1>SELECT A LANGUAGE</h1>
-                </div>
-            -->
-            
             <div class="languages">
-                <button v-for="(language, index) in languages" :key="index" class="btn" @click="changeLanguage( language.id )"
+                <button v-for="(language, index) in languages" :key="index" class="btn btn-pointer" @click="changeLanguage( language.id )"
                 :style="{ backgroundImage: 'url(' + require(`@/${ language.image }`) + ')' }">
                     {{language.screen_name}}
                   </button>
@@ -59,8 +53,10 @@ export default {
 .turorial-div {
     position: absolute;
     align-content: center;
-
-    background: #8fc9f8;
+    background: url('~@/assets/BG_language.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
     height: 100vh;
     width: 100vw;
     margin: 0;
@@ -82,15 +78,18 @@ h1 {
     grid-template-rows: 100%;
     grid-template-areas: 
         "languages";
-    height: 90vh;
+    height: 95vh;
     width: 90vw;
     max-width: 600px;
-    max-height: 90vh;
+    max-height: 95vh;
     border-radius: 10px;
-    /*
-    border: 3px solid black;
-    background: rgb(255, 255, 255);
-    */
+
+    margin: 0;
+    padding: 0;
+
+    /* border: 3px solid black;
+    background: rgb(255, 255, 255);  */
+    
 }
 
 .title {
@@ -118,7 +117,7 @@ h1 {
     cursor: pointer;
     
     /*background: rgb(113, 235, 178);*/
-    cursor: pointer; 
+    /* cursor: pointer;  */
     border: 3px solid rgb(255, 255, 255);
     font-size: 2.5vh;
 

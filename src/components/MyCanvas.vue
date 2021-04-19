@@ -67,6 +67,7 @@ export default {
             resources_interval: 400,
             res_img: null,
             resource_audio_src: AUDIO_FILES.AUDIO_RESOURCE,
+            health_audio_src: AUDIO_FILES.AUDIO_HEALTH,
 
             /**ABILITY**/
             ability: null,
@@ -116,14 +117,15 @@ export default {
             collisions: 0,
             collision_image: null,
             last: 0,                //timestamp frame anterior
-            color_header: "rgba(250, 200, 200, 1)",
+            color_header: "rgba(153, 230, 153, 1)",
             ability_button: null,
             image_container: {},
-            images_preload: 11,
+            images_preload: 10,
             images_current: 0,
             finish: null,
             full_size: false,
             ratio: 1,
+            show_fps: false,
 
             /**FRAMES**/
             total_frames: 0,
@@ -143,6 +145,7 @@ export default {
 
             /**AUDIO**/
             pickResource: null,
+            pickHealth: null,
             collisionSound: null
         }
     },
@@ -221,14 +224,7 @@ export default {
                     } else {    //estamos en modo Pausa
                         this.continueGame();
                     }
-                } else if ( this.reset_button.isHit(x,y) ) {
-                    //this.resetGame();
-                    //SOLO DE PRUEBA --> llama al quiz
-                    this.status = false;
-                    document.dispatchEvent(this.pause_event);
-                    this.$emit('openQuiz', JSON.stringify( {ability: this.ability_quiz} ));
-                    
-                } else if ( this.character.has_ability ) {
+                } else if ( this.character.has_ability && this.ability_button != null ) {
                     if ( this.ability_button.isHit(x,y) ) {
                         this.ability_isActive = !this.ability_isActive;
                         switch (this.character.ability) {
@@ -239,24 +235,9 @@ export default {
                                 break;
                             default:
                                 if (this.tileset_snow) { 
-                                    this.changeTileset( MAPS[ LEVELS[this.level].map ].tileset );
-                                    this.tileset_snow = false;
-                                    this.gamespeed = 4;
-                                    this.isSnowing = false;
-                                    this.player.changeParticleColor( "rgba(0,0,0,");
-                                    this.color_header = "rgba(250, 200, 200, 1)";
-                                    this.ability_button.active = false;
+                                    this.makeSnow( false );
                                 } else {
-                                    var m = this.level == 2 ? 3 : 1;
-                                    this.changeTileset( MAPS[ m ].tileset );
-                                    this.tileset_snow = true;
-                                    this.gamespeed = 2;
-                                    this.isSnowing = true;
-                                    this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
-                                    this.snow.createSnowParticles();
-                                    this.player.changeParticleColor( "rgba(255,255,255,");
-                                    this.color_header = "rgba(150, 220, 240, 1)";
-                                    this.ability_button.active = true;
+                                    this.makeSnow( true );
                                 }
                                 break;
                         }
@@ -317,12 +298,50 @@ export default {
                         this.full_size = !this.full_size;
                         this.onResize();
                         break;
+                    case 81:    // Q
+                        this.status = false;
+                        document.dispatchEvent(this.pause_event);
+                        this.$emit('openQuiz', JSON.stringify( {ability: this.ability_quiz} ));
+                        break;
+                    case 70:    // F
+                        this.show_fps = !this.show_fps;
+                        break;
+                    case 76:    // L
+                        this.player.lives += 50;
+                        break;
                     default:
-                        //console.log( event.keyCode)
+                        console.log( event.keyCode)
                         break;
                 }
             } else {
                 this.player.onMouseUp();
+            }
+        },
+        makeSnow( doSnow ) {
+            if ( doSnow ) {
+                var m = this.level == 2 ? 3 : 1;
+                this.changeTileset( MAPS[ m ].tileset );
+                this.tileset_snow = true;
+                this.gamespeed = 2;
+                this.isSnowing = true;
+                this.snow = new SNOW.Snow( this.canvas.width, this.canvas.height );
+                this.snow.createSnowParticles();
+                this.player.changeParticleColor( "rgba(255,255,255,");
+                this.color_header = "rgba(150, 220, 240, 1)";
+                this.ability_button.active = true;
+                var that = this;
+                setTimeout(function(){ 
+                    that.makeSnow( false );
+                }, 5000);
+            } else {
+                this.changeTileset( MAPS[ LEVELS[this.level].map ].tileset );
+                this.tileset_snow = false;
+                this.gamespeed = 4;
+                this.isSnowing = false;
+                this.player.changeParticleColor( "rgba(0,0,0,");
+                this.color_header = "rgba(153, 230, 153, 1)";
+                this.ability_button.active = false;
+                this.ability_isActive = false;
             }
         },
         scored() {
@@ -332,10 +351,10 @@ export default {
             //Texto
             this.context.font = "60px Press Start 2P";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
-            this.context.fillText("S: " + this.score, 400, 70);
+            this.context.fillText("S: " + this.score, 450, 70);
             //var img = this.getImage( require(`@/assets/heart.png`) );
-            UTILS.drawImageAtPoint(this.context, this.heart_img, 0, 0, 128, 128, 700, 50, 120, 120);
-            this.context.fillText(this.player.lives, 682, 72);
+            UTILS.drawImageAtPoint(this.context, this.heart_img, 0, 0, 128, 128, 750, 50, 120, 120);
+            this.context.fillText(this.player.lives, 732, 72);
         },
         //Se llama en cada ciclo del juego
         update( elapsed_time ) {
@@ -398,13 +417,15 @@ export default {
 
                 if ( UTILS.collisionCenter(this.player.pos.x, this.player.pos.y, this.player.SPRITE_SIZE_X, this.player.SPRITE_SIZE_Y, this.resources[i].x, this.resources[i].y, this.resources[i].width, this.resources[i].height, true ) && this.resources[i].isHit == false ) {
                     this.resources[i].isHit = true;
-                    this.pickResource.play();
+                    
                     
                     if ( this.resources[i].type == "QUIZ" ) {
+                        this.pickResource.play();
                         this.status = false;
                         document.dispatchEvent(this.pause_event);
                         this.$emit('openQuiz', JSON.stringify( {ability: this.ability_quiz} ));
                     } else if ( this.resources[i].type == "HEALTH" ) {
+                        this.pickHealth.play();
                         this.player.increaseLive();
                     }
                 }
@@ -454,7 +475,7 @@ export default {
                     if ( this.levelID == 2 && rnd == 0 ){
                         var x = obs.x;
                         var y = obs.y;
-
+                        // Segundo obstaculo
                         var obs2 = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, y, x, true );
                         if ( obs2 != null ) {
                             this.obstacles.push( obs2 );
@@ -545,7 +566,7 @@ export default {
             this.handleFloatingMessages();
 
             //FPS
-            this.drawFPS();
+            if( this.show_fps) { this.drawFPS(); }
 
             this.display.drawImage(this.context.canvas, 0, 0, this.context.canvas.width, this.context.canvas.height, 0, 0, this.display.canvas.width, this.display.canvas.height);
 
@@ -604,6 +625,7 @@ export default {
             this.score = 0;
             this.collisions = 0;
             this.obstacles.length = 0;
+            this.resources.length = 0;
             this.obstacles = OBSTACLE.initObstacles( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.obstacles, this.spawn_points); 
         },
         onResize() {
@@ -638,7 +660,7 @@ export default {
                 this.explosions[e].update();
                 this.explosions[e].draw( this.context );
 
-                if ( this.explosions[e].current_frame >= 7 ) {
+                if ( this.explosions[e].current_frame >= 6 ) {
                     this.explosions.splice(e, 1);
                 }
             }
@@ -719,7 +741,7 @@ export default {
 
         /**BOTONES**/
         var pause_img = this.getImage( require(`@/assets/button.png`) );
-        var reset_img = this.getImage( require(`@/assets/reset.png`) );
+        // var reset_img = this.getImage( require(`@/assets/reset.png`) );
         
         pause_img.addEventListener("load", function(event) { 
             that.pause_button = new BUTTON.Button(pause_img, 900, 10, 80, 80, 128, false, 2, false); 
@@ -727,42 +749,48 @@ export default {
             console.log("PAUSE LOADED");
             that.images_current++;
         });
+        /*
         reset_img.addEventListener("load", function(event) { 
             that.reset_button = new BUTTON.Button(reset_img, 800, 10, 80, 80, 128, false, 2, false);
             that.buttons.push(that.reset_button);
             console.log("RESET LOADED");
             that.images_current++;
-        });
+        }); */
 
         /**HABILIDAD**/
         if ( this.character.has_ability ) {
             
             var ability_img;
-            switch( this.character.ability ) {
+            var needs_button = true;
+            switch( this.character.ability[0] ) {
                 case "Darkness":
                     console.log("Darkness ability");
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
                     break;
-                case "Quiz":
+                case "Knowledge":
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
                     this.ability_quiz = true;
+                    needs_button = false;
                     break;
                 default:    //Snow
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
                     break;
             }
-            ability_img.addEventListener("load", function(event) { 
-                that.ability_button = new BUTTON.Button(ability_img, 880, 110, 100, 100, 125, false, 31, true);
-                that.ability = new ABILITY.Ability( ability_img );
-                that.buttons.push(that.ability_button);
-                console.log("ABILITY LOADED");
-                that.images_current++;
-            });
+
+            if ( needs_button ) {
+                ability_img.addEventListener("load", function(event) { 
+                    that.ability_button = new BUTTON.Button(ability_img, 880, 110, 100, 100, 125, false, 31, true);
+                    that.ability = new ABILITY.Ability( ability_img );
+                    that.buttons.push(that.ability_button);
+                    console.log("ABILITY LOADED");
+                    that.images_current++;
+                });
+            } else {
+                this.images_preload--;
+            }
         } else {
             this.images_preload--;
         }
-        
-        //this.buttons.push(this.pause_button, this.reset_button, this.ability_button);
 
         /**FONDO DEL JUEGO**/
         var bg_img = this.getImage( require(`@/assets/BG.png`) );
@@ -776,7 +804,6 @@ export default {
         /**OBSTACULOS**/
         this.obs_img = this.getImage( require(`@/assets/obstacles.png`) );
         this.obs_img.addEventListener("load", function(event) { 
-            //that.obstacles = OBSTACLE.initObstacles(that.obs_img, that.obstacles, that.spawn_points, that.level);
             console.log("OBSTACLES LOADED");
             that.images_current++;
         });
@@ -792,7 +819,7 @@ export default {
         var explosion_img2 = this.getImage( require(`@/assets/explosion2.png`) );
         explosion_img2.addEventListener("load", function(event) { 
             that.explosion_imgs.push( explosion_img2 );
-            console.log("EXPLOSION 1 LOADED");
+            console.log("EXPLOSION 2 LOADED");
             that.images_current++;
         });
 
@@ -813,6 +840,8 @@ export default {
         /**AUDIO**/
         this.pickResource = new Audio( require(`@/${this.resource_audio_src}`));
         this.pickResource.volume = 0.1;
+        this.pickHealth = new Audio( require(`@/${this.health_audio_src}`));
+        this.pickHealth.volume = 0.1;
         this.collisionSound = new Audio( require(`@/${this.collision_audio_src}`) );
         this.collisionSound.volume = 0.1;
 

@@ -12,7 +12,7 @@
     </transition>
     
     <div class="selection-container">
-        <div v-bind:class="[isOpen ? blurClass : '', bkClass]">
+        <div v-bind:class="[isOpen ? blurClass : '']">
         <div class="selection-div">
             <CharacterList 
                 :imageUrl="imageUrl" 
@@ -33,8 +33,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants } from '@/consts.js';
+import { mapState } from 'vuex';
 import CharacterList from '@/components/CharacterList.vue';
 import CharacterDetail from '@/components/CharacterDetail.vue';
 import PopUp from '@/components/PopUp.vue';
@@ -52,14 +51,13 @@ export default {
             imageUrl: 'something',
             characterID: '',
             showDetail: false,
-            bkClass: 'bk',
             blurClass: 'blur',
             isOpen: false,  //Para mostrar o no el pop up
             phraseID: 1     //Frase que ha de aparecer en el pop up
         }
     },
     computed: {
-        ...mapState( ['stage'] )
+        ...mapState( ['stage', 'enablePopUp'] )
     },
     methods: {
         setCharacterID(id) {
@@ -79,16 +77,12 @@ export default {
         }
     },
     mounted() {
-      this.isOpen = true;
+      this.isOpen = this.enablePopUp;
     }
 }
 </script>
 
 <style scoped>
-.bk {
-  /*transition: all 0.5s ease-out;*/
-}
-
 .blur {
   filter: grayscale(100) blur(2px);
   /*Desactivar botones y cualquier interaccion posible*/
@@ -104,7 +98,7 @@ export default {
 }
 
 .selection-div {
-    padding: 10px;
+    /*padding: 10px;*/
     background-color: red;
     height: 100vh;
 
@@ -114,7 +108,10 @@ export default {
     flex-direction: column;
     /*width: calc(100% - 20px);*/
     /*min-height: calc(100vh - 20px);*/
-    background: radial-gradient(#156F99, #0A2E50);
+    background: url('~@/assets/BG_character.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
     font-family: 'Press Start 2P', 'Carter One', arial;
     font-weight: normal;
 }

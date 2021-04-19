@@ -30,7 +30,8 @@ export class Player {
         this.ability = new ABILITY.Ability();
         this.has_ability = true;
         this.particle_color = 'rgba(0, 0, 0,';
-        this.lives =  200;
+        this.lives =  5;
+        this.initial_lives = 5;
     }
 
     update(timestamp, gamespeed, frames_done) {
@@ -156,6 +157,7 @@ export class Player {
     
     reset() {
         this.pos = { x: 500, y: 855 };
+        this.lives = this.initial_lives;
     }
 
     

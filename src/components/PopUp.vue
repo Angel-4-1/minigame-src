@@ -21,7 +21,7 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn-modal-blink" @click="closePopUp">{{ btn_text }}</button>
+                <button class="btn-modal-blink btn-pointer" @click="closePopUp">{{ btn_text }}</button>
             </div>
 
         </div>

@@ -11,15 +11,15 @@
         <div class="pause-menu" v-if="show">
 
             <div class="pause-header">
-                <h1>PAUSE</h1>
+                <h1>{{ titles.TITLE_PAUSE[language_id] }}</h1>
             </div>
 
             <!-- Botones parte inferior -->
             <div class="pause-buttons">
-                <button class="btn" @click="closeMenu">RESUME</button>
-                <button class="btn" @click="reset">RESET</button>
-                <button class="btn" @click="closeMenu">SETTINGS</button>
-                <button class="btn btn-quit" @click="quit">EXIT</button>
+                <button class="btn btn-pointer" @click="closeMenu">{{ buttons.BUTTON_PAUSE_RESUME[language_id] }}</button>
+                <button class="btn btn-pointer" @click="reset">{{ buttons.BUTTON_PAUSE_RESET[language_id] }}</button>
+                <button class="btn btn-pointer" @click="openObstaclesMenu">{{ buttons.BUTTON_PAUSE_OBSTACLES[language_id] }}</button>
+                <button class="btn btn-quit btn-pointer" @click="quit">{{ buttons.BUTTON_PAUSE_EXIT[language_id] }}</button>
                 <!--
                     <button class="btn btn-close" @click="closeDetail"></button>
                 -->
@@ -27,10 +27,16 @@
             
         </div>
 
+        <ObstaclesMenu v-if="isObstaclesPressed()"
+            @closeObstaclesMenu="closeObstaclesMenu"/>
+
     </div>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import { BUTTONS, TITLES } from '@/consts.js';
+import ObstaclesMenu from '@/components/ObstaclesMenu.vue';
 
 export default {
     name: 'PauseMenu',
@@ -38,12 +44,22 @@ export default {
         'closePauseMenu',
         'resetGame',
         'quitGame' 
-    ],    
+    ],
+    components: {
+        ObstaclesMenu,
+    },
     props: [ 'isPaused' ],
     data() {
         return {
-            show: this.$props['isPaused']
+            show: this.$props['isPaused'],
+            language_id: 0,
+            buttons: BUTTONS,
+            titles: TITLES,
+            showObstacles: false
         }
+    },
+    computed: {
+        ...mapState( ['stage' , 'language'] )
     },
     methods: {
         closeMenu() { //salir del menu de pausa
@@ -57,7 +73,21 @@ export default {
         quit() {
             this.closeMenu();
             this.$emit('quitGame');
+        },
+        openObstaclesMenu() {
+            this.showObstacles = true;
+            this.show = false;
+        },
+        isObstaclesPressed() {
+            return this.showObstacles;
+        },
+        closeObstaclesMenu() {
+            this.showObstacles = false;
+            this.show = true;
         }
+    },
+    mounted() {
+        this.language_id = this.language.id;
     },
     created() {
         this.show = true;
@@ -101,7 +131,7 @@ h1 {
     margin: 5%;
 
     display: grid;
-    grid-template-rows: 20% 80%;
+    grid-template-rows: 15% 85%;
     grid-template-areas: 
         "header"
         "buttons";
@@ -130,16 +160,10 @@ h1 {
     outline: none;
     border: none;
     border-radius: 20px;
-
-    color: #000;
-    cursor: pointer;
-
-    
+    color: #000;    
     background: rgb(113, 235, 178);
-    cursor: pointer; 
     border: 3px solid rgb(255, 255, 255);
     font-size: 2vh;
-
     font-family: 'Press Start 2P', sans-serif;
     letter-spacing: 1px;
 }
