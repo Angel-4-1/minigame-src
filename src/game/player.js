@@ -3,7 +3,7 @@ import * as UTILS from '../game/utils.js';
 import * as ABILITY from '../game/ability.js';
 
 export class Player {
-    constructor(_sprite, _animation, _frames, _SPRITE_SIZE_X, _SPRITE_SIZE_Y) {
+    constructor(_sprite, _animation, _frames, _SPRITE_SIZE_X, _SPRITE_SIZE_Y, _health) {
         this.sprite = _sprite;               //imagen sprite
         this.sprite_x = 0; this.sprite_y = 0;
         this.sprite_width = 0; this.sprite_height = 0; this.sprite_right = 0; this.sprite_bottom = 0;
@@ -30,8 +30,8 @@ export class Player {
         this.ability = new ABILITY.Ability();
         this.has_ability = true;
         this.particle_color = 'rgba(0, 0, 0,';
-        this.lives =  5;
-        this.initial_lives = 5;
+        this.lives =  _health;
+        this.initial_lives = _health;
     }
 
     update(timestamp, gamespeed, frames_done) {

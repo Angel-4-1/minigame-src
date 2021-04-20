@@ -72,7 +72,7 @@ export default {
             /**ABILITY**/
             ability: null,
             ability_isActive: false,
-            ability_quiz: false,
+            ability_quiz: 0,
 
             /**NIVEL**/
             //level: LEVELS[ this.$props['levelID'] ],
@@ -729,7 +729,7 @@ export default {
         /**CREAR AL PLAYER**/
         var player_img = this.getImage( require(`@/${this.character.sprite}`) );
         player_img.addEventListener("load", function(event) {// When the load event fires, do this:
-            that.player = new PLAYER.Player(player_img, that.character.animation, that.character.frames, that.character.sprite_size_x, that.character.sprite_size_y );
+            that.player = new PLAYER.Player(player_img, that.character.animation, that.character.frames, that.character.sprite_size_x, that.character.sprite_size_y, that.character.health );
             //Set de animaciones inicial
             that.player.setAnimation(that.player.BACK);
             //Offset del player
@@ -763,14 +763,16 @@ export default {
             var ability_img;
             var needs_button = true;
             switch( this.character.ability[0] ) {
-                case "Darkness":
-                    console.log("Darkness ability");
-                    ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
-                    break;
                 case "Knowledge":
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
-                    this.ability_quiz = true;
+                    this.ability_quiz = 1;
                     needs_button = false;
+                    break;
+                case "More Time":
+                    console.log("More Time on quiz ability");
+                    ability_img = this.getImage( require(`@/assets/ability_snow.png`) );
+                    needs_button = false;
+                    this.ability_quiz = 2;
                     break;
                 default:    //Snow
                     ability_img = this.getImage( require(`@/assets/ability_snow.png`) );

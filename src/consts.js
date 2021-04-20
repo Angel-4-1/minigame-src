@@ -19,7 +19,7 @@ export const CHARACTERS = [
             "This character represents that inexperienced user who enters a social media for the first time, so he does not have sufficient knowledge about what he should and should not publish on the network since he is unaware of the risks of publishing his private information to the outside world and the effects that this would mean",
             "Este personaje representa a ese usuario sin experiencia que ingresa a un medio social por primera vez, por lo que no dispone del conocimiento suficiente sobre lo que debe y no debe publicar en la red ya que desconoce los riesgos de publicar su información privada al mundo exterior y los efectos que esto supondría" 
         ], 
-        has_ability: false, ability: [ "None" , "Ninguna"] , sprite: "assets/characters/boy_spritesheet.png" , 
+        has_ability: false, ability: [ "None" , "Ninguna"] , health: 5 , sprite: "assets/characters/boy_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
@@ -34,7 +34,7 @@ export const CHARACTERS = [
             "This character represents that inexperienced user who enters a social media for the first time, so he does not have sufficient knowledge about what he should and should not publish on the network since he is unaware of the risks of publishing his private information to the outside world and the effects that this would mean",
             "Este personaje representa a ese usuario sin experiencia que ingresa a un medio social por primera vez, por lo que no dispone del conocimiento suficiente sobre lo que debe y no debe publicar en la red ya que desconoce los riesgos de publicar su información privada al mundo exterior y los efectos que esto supondría" 
         ], 
-        has_ability: false, ability: [ "None" , "Ninguna"] , sprite: "assets/characters/girl_spritesheet.png" , 
+        has_ability: false, ability: [ "None" , "Ninguna"] , health: 5 , sprite: "assets/characters/girl_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
@@ -49,7 +49,7 @@ export const CHARACTERS = [
             "Something",
             "Algo"
         ], 
-        has_ability: true, ability: [ "Froze time" , "Relantizar tiempo"] , sprite: "assets/characters/froze_spritesheet.png" , 
+        has_ability: true, ability: [ "Froze time" , "Relantizar tiempo"] , health: 3 , sprite: "assets/characters/froze_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
@@ -59,12 +59,27 @@ export const CHARACTERS = [
         ]
     },
     
-    { name: "Amateur" , id: 3, icon: "assets/characters/senior_face.png" , 
+    { name: "Punky" , id: 3, icon: "assets/characters/punky_face.png" , 
+        data: [
+            "He will give you 10 extra seconds for the quiz questions",
+            "Te dará 10 segundos extra para las preguntas del cuestionario"
+        ],
+        has_ability: true, ability: [ "More Time" , "Mayor Tiempo"] , health: 3 , sprite: "assets/characters/punky_spritesheet.png" , 
+        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
+        animation: [ 
+            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
+            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
+            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
+            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
+        ]
+    },
+
+    { name: "The wise" , id: 4, icon: "assets/characters/senior_face.png" , 
         data: [
             "This user posses the power of knowledge, it may help you during the quiz questions by discarding an answer",
             "Este usuario posee el poder del concocimiento, quizas te ayudará durante las preguntas quiz descartando una de las respuestas"
         ],
-        has_ability: true, ability: [ "Knowledge" , "Conocimiento"] , sprite: "assets/characters/senior_spritesheet.png" , 
+        has_ability: true, ability: [ "Knowledge" , "Conocimiento"] , health: 3 , sprite: "assets/characters/senior_spritesheet.png" , 
         sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
         animation: [ 
             [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
@@ -74,20 +89,6 @@ export const CHARACTERS = [
         ]
     },
     
-    { name: "Punky" , id: 4, icon: "assets/characters/punky_face.png" , 
-        data: [
-            "Something",
-            "Algo"
-        ],
-        has_ability: true, ability: [ "None" , "Ninguna"] , sprite: "assets/characters/punky_spritesheet.png" , 
-        sprite_size_x: 128, sprite_size_y: 165 , frames: 4, 
-        animation: [ 
-            [ { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 1, y: 0 } ],  /*Delante*/
-            [ { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 1, y: 2 } ],  /*Izquierda*/
-            [ { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 1, y: 1 } ],  /*Derecha*/
-            [ { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 1, y: 3 } ]   /*Detras*/
-        ]
-    }
 ];
 
 export const LEVELS = [
@@ -209,6 +210,7 @@ export const TITLES = {
     TITLE_CHARACTER_LIST: [ "Choose a character", "Selecciona un personaje" ],
     TITLE_CHARACTER_DESCRIPTION: [ "Description" , "Descripción" ],
     TITLE_CHARACTER_ABILITY: [ "Ability" , "Habilidad" ],
+    TITLE_CHARACTER_HEALTH: [ "Health" , "Salud" ],
     TITLE_PAUSE: [ "PAUSE" , "PAUSA" ],
     TITLE_OBSTACLES: [ "OBSTACLES" , "OBSTÁCULOS" ],
     TITLE_GAMEOVER: [ "GAME OVER" , "FIN DE LA PARTIDA" ],

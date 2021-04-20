@@ -160,8 +160,11 @@ export default {
 
         // Check if the character has the ability to help on the quiz
         this.ability = this.$props['quizAbility'];
-        if( this.ability ) {
+        if( this.ability == 1 ) {
             this.randomlySelectFalseAnswer();
+        } else if ( this.ability == 2 ) {
+            this.timer.current_time += 10;
+            this.timer.max_time += 10;
         }
 
         // Prepare audios

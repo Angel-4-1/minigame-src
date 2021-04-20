@@ -38,10 +38,19 @@
                             <span class="data"><p>{{ character.data[language_id] }}</p></span>
                         </div>
                         
+                        <div class="detail-footer">
+                            <div class="detail-abilities">
+                                <div class="header"><h3>{{ titles.TITLE_CHARACTER_ABILITY[language_id] }}</h3></div>
+                                <div class="type"><span>{{ character.ability[language_id] }}</span></div>
+                            </div>
 
-                        <div class="detail-abilities">
-                            <div class="header"><h3>{{ titles.TITLE_CHARACTER_ABILITY[language_id] }}</h3></div>
-                            <div class="type"><span>{{ character.ability[language_id] }}</span></div>
+                            <div class="detail-health">
+                                <div class="header"><h3>{{ titles.TITLE_CHARACTER_HEALTH[language_id] }}</h3></div>
+                                <div class="health-footer">
+                                    <div class="desc"><span>x {{ character.health }}</span></div>
+                                    <img class="heart-icon" :src="require(`@/assets/heartDesc.png`)" >
+                                </div>
+                            </div>
                         </div>
                         
                     </div>
@@ -208,14 +217,21 @@ h3 {
     grid-template-rows: 70% 30%;
     grid-template-areas: 
         "properties"
-        "abilities";
+        "footer";
+}
+
+.detail-footer {
+    grid-area: footer;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-areas: 
+        "abilities health";
 }
 
 .detail-content-back .property {
     margin: 2%;
     text-align: justify;
     line-height: 1.5;
-    
 }
 
 .detail-properties {
@@ -258,11 +274,22 @@ h3 {
     text-align: justify;
 }
 
+.detail-health {
+    grid-area: health;
+    display: grid;
+    grid-template-rows: 40% 60%;
+    grid-template-areas: 
+        "header"
+        "health-footer";
+    margin: 2%;
+    text-align: justify;
+}
+
 .detail-abilities .header {
     grid-area: header;
 }
 
-.detail-abilities .header h3 {
+.header h3 {
     border-bottom: 3px solid rgb(0, 0, 0);
 }
 
@@ -270,6 +297,7 @@ h3 {
     grid-area: type;
     padding-top: 2%;
     margin-top: 1%;
+    text-align: center;
 }
 
 .detail-abilities .type span {
@@ -279,6 +307,27 @@ h3 {
     color: white;
 }
 
+.health-footer {
+    grid-area: health-footer;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-areas: 
+        "img desc";
+    margin: 2%;
+    margin-left: 20%;
+    text-align: justify;
+}
+
+.desc {
+    grid-area: desc;
+    margin-top: 10%;
+    margin-left: -5%;
+}
+
+.heart-icon {
+    grid-area: img;
+    width: 60%;
+}
 
 /*BOTONES*/
 .detail .buttons {
