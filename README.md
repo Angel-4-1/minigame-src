@@ -1,19 +1,9 @@
-# minigame-privacy
+# Defend Your Privacy :video_game:
 
-## Project setup
-```
-npm install
-```
+A mini game to help teenagers know what should not be posted on social media in terms of privacy
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+![InGame](ingame.png)
 
-### Compiles and minifies for production
-```
-npm run build
-```
+Developed using VueJS
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Click [HERE](https://angel-4-1.github.io/minigame-public/) to play the game 
