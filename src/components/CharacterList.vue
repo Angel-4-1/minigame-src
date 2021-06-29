@@ -14,7 +14,7 @@ Mostrar una lista con los distintos personajes disponibles
             <article v-for="(character, index) in characters" :key="index" @click="setCharacterID(character.id)" class="myarticle btn-pointer">
                 
                 <img class="image btn-pointer" :src="require(`@/${character.icon}`)" width="96" height="96" alt="Character Icon Not Found">
-                <h3>{{ character.name }}</h3>
+                <h3>{{ character.name[language_id] }}</h3>
             
             </article>
             
@@ -29,9 +29,6 @@ import { mapState } from 'vuex';
 
 export default {
     name: 'CharacterList',
-    props: [
-        'imageUrl',
-    ],
     emits: ['setCharacterID'],  //aquello que enviamos al componente padre
     data() {
         return {

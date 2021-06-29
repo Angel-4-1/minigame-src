@@ -132,12 +132,14 @@ export class Player {
         }*/
     }
 
-    drawHitVersion( ctx ) {
-        this.sprite
-    }
+    // drawHitVersion( ctx ) {
+    //     this.sprite
+    // }
 
     mousedown(x, y) {
-        //true = se ha de mover  |  false = se queda quieto
+        //input  -> x,y = coordenados del canvas donde se ha pulsado
+        //output -> true = se ha de mover  |  false = se queda quieto
+        
         //Donde estan estas coordenadas respecto al player ?
         if ( x < this.pos.x + this.offset.x) {          //Antes
             this.setAnimation(this.LEFT);
@@ -191,6 +193,9 @@ export class Player {
     }
 
     increaseLive( ) {
-        this.lives++;
+        var target_lives = this.lives + 1;
+        if ( target_lives <= this.initial_lives ) {
+            this.lives = target_lives;
+        }
     }
 }

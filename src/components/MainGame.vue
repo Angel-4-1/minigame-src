@@ -40,7 +40,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES, CHARACTERS, LEVELS } from '@/consts.js';
+import { STAGES, CHARACTERS, LEVELS, AUDIO_FILES } from '@/consts.js';
 import MyCanvas from '@/components/MyCanvas.vue';
 import PauseMenu from '@/components/PauseMenu.vue';
 import QuizQuestion from '@/components/QuizQuestion.vue';
@@ -70,7 +70,10 @@ export default {
             isQuiz: false,
             quizAbility: false,
             bkClass: 'bk',
-            blurClass: 'blur'
+            blurClass: 'blur',
+            BGaudio: null,
+            audio_src: AUDIO_FILES.AUDIO_AMBIENT,
+            audio_started: false
         }
     },
     computed: {
@@ -117,19 +120,43 @@ export default {
         },
         closePopUp() {
             this.toggleModal();
+            this.startAudio();                  
         },
         canStart() {
             return !this.isOpen;
-        }
+        },
+        startAudio() {
+            if(this.audio_started) {
+                return;
+            }
+            /**AUDIO**/
+            this.BGaudio = new Audio( require(`@/${this.audio_src}`));
+            this.BGaudio.volume = 0.1;
+            this.BGaudio.play();
+            this.BGaudio.addEventListener( 'ended', this.playSound );
+            this.audio_started = true;
+        },
+        playSound() {
+            this.BGaudio.currentTime = 0;
+            this.BGaudio.play(); 
+        },
     },
     created() {
         this.isPaused = false;
     },
     mounted() {
         this.isOpen = this.enablePopUp;
+        if(!this.isOpen) {
+            this.startAudio();
+        }
     },
-    beforeUnmount() { 
-        
+    unmounted() { 
+        if(!this.audio_started) {
+            return;
+        }
+        this.BGaudio.pause();
+        this.BGaudio.currentTime = 0;
+        this.BGaudio.removeEventListener( 'ended', this.playSound );
     }
 }
 </script>

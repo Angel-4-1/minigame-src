@@ -29,6 +29,7 @@ export class Explosion {
     }
 
     draw( ctx ) {
-        UTILS.drawImageAtPoint(ctx, this.sprite, this.current_frame * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        //UTILS.drawImageAtPoint(ctx, this.sprite, this.current_frame * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        UTILS.drawImageAtPoint(ctx, this.sprite, this.current_frame * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, 250, 250);
     }
 }

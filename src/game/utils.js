@@ -36,7 +36,7 @@ export function collisionTopLeft(rect1_x, rect1_y, rect1_width, rect1_height, re
 
 /*Mirar si hay una collision considerando que los rectangulos estan expreados de la forma
 
- (x-width/2,y-height/2) ---------------- (x-width/2,y+height/2)
+ (x-width/2,y-height/2) ---------------- (x+width/2,y-height/2)
    |                       |                       |
    | ------------------- (x,y) ------------------- |
    |                       |                       |

@@ -3,12 +3,11 @@
 <template>
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
     <div class="finalstage-container">
-
         <div class="board-menu">
-
             <div class="board-header">
-                <span class="header-empty"></span>
+                <button class="header-empty btn-pointer" :style="{ backgroundImage: 'url(' + require(`@/assets/checklist2.png`) + ')' }" @click="openSurvey"></button>
                 <span class="header-title">
                     <h1 v-if="showResults">{{ titles.TITLE_GAMEOVER[language_id] }}</h1>
                     <h1 v-else>{{ titles.TITLE_GAMEOVER_STANDINGS[language_id] }}</h1>
@@ -63,21 +62,24 @@
                 <button class="btn btn-pointer" @click="reset">{{ buttons.BUTTON_GAMEOVER_RESET[language_id] }}</button>
                 <button class="btn btn-pointer" @click="goHome">{{ buttons.BUTTON_GAMEOVER_HOME[language_id] }}</button>
             </div>
-            
-        </div>
 
+        </div>
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { STAGES as stages_constants, AUDIO_FILES, TITLES, BUTTONS } from '@/consts.js';
+import { STAGES as stages_constants, AUDIO_FILES, TITLES, BUTTONS, INSTRUCTOR } from '@/consts.js';
+import PopUp from '@/components/PopUp.vue';
 
 export default {
     name: 'FinalStage',
     props: [
         'score_obtained'
     ],
+    components: {
+        PopUp
+    },
     emits: [ 'resetGame' ],
     data() {
         return {
@@ -96,7 +98,11 @@ export default {
             audio_src: AUDIO_FILES.AUDIO_GAMEOVER,
             standings: null,
             showResults: true,
-            standings_player_pos: -1
+            standings_player_pos: -1,
+            isOpen: false,  //Para mostrar o no el pop up
+            phraseID: 3,
+            blurClass: 'blur',
+            survey: INSTRUCTOR[0].phrases[3].survey,
         }
     },
     computed: {
@@ -147,6 +153,12 @@ export default {
             }
 
             this.standings_player_pos = max_index;
+        },
+        openSurvey() {
+            window.open( this.survey, "_blank");
+        },
+        closePopUp() {
+            this.isOpen = false;
         }
     },
     mounted() {
@@ -176,6 +188,7 @@ export default {
         
         this.updateStandings();
         this.showResults = true;
+        this.isOpen = true;
     },
     unmounted() {
         this.BGaudio.pause();
@@ -247,6 +260,17 @@ h2 {
 
 .header-empty {
     grid-area: h-empty;
+    outline: none;
+    border: none;
+    border-radius: 20px;
+    color: #000;
+    background: rgb(255, 255, 255, 0);
+    font-size: 2vh;
+    font-family: 'Press Start 2P', sans-serif;
+    letter-spacing: 1px;
+    background-size: cover;
+    background-position: center center;
+    animation: blinkingText 2s infinite;
 }
 
 .header-title {
@@ -270,9 +294,10 @@ h2 {
     letter-spacing: 1px;
     background-size: cover;
     background-position: center center;
+    animation: blinkingText 2s infinite;
 }
 
-.header-btn:hover {
+.header-btn:hover, .header-empty:hover {
     opacity: 0.6;
 }
 
@@ -415,4 +440,12 @@ h2 {
     color: white;
 }
 
+@keyframes blinkingText{
+    0%, 30% { 
+        opacity: 0; 
+    } 
+    40%, 99% { 
+        opacity: 1; 
+    }
+}
 </style>

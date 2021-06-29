@@ -14,14 +14,12 @@
     <div class="selection-container">
         <div v-bind:class="[isOpen ? blurClass : '']">
         <div class="selection-div">
-            <CharacterList 
-                :imageUrl="imageUrl" 
+            <CharacterList
                 @setCharacterID="setCharacterID"/>
 
             <transition name="fade">
                 <CharacterDetail 
-                    v-if="showDetail" 
-                    :imageUrl="imageUrl" 
+                    v-if="showDetail"
                     :characterID="characterID"
                     @closeDetail="closeDetail"
                     @characterIsSelected="characterIsSelected"/>
@@ -48,7 +46,6 @@ export default {
     emits: ['characterIsSelected'], //lo que esta emitiiendo a otros componentes
     data() {
         return {
-            imageUrl: 'something',
             characterID: '',
             showDetail: false,
             blurClass: 'blur',

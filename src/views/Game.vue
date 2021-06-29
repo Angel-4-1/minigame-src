@@ -2,7 +2,7 @@
 
 <template> <!--IMPORTANTE: Template y div van juntos-->
     <div class="game-div">
-        <!--@s nos lleva directo a la carpeta src-->
+        <!--@ nos lleva directo a la carpeta src-->
 
         <div v-if="current_stage.id == my_stages.STAGE"><Stage/></div>
         <div v-if="current_stage.id == my_stages.INTRO_STAGE"><IntroStage/></div>
@@ -19,9 +19,9 @@
                 @resetGame="resetGame"/>
         </div>
 
-        <h1> ID: {{ current_stage.id }} Name: {{ current_stage.name }}</h1>
+        <!-- <h1> ID: {{ current_stage.id }} Name: {{ current_stage.name }}</h1>
         <button @click="changeState( true )">Next Stage</button>
-        <button @click="changeState( false )">Previous Stage</button>
+        <button @click="changeState( false )">Previous Stage</button> -->
 
     </div>
 </template>

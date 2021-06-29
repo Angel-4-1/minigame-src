@@ -15,9 +15,13 @@
                 <h1>{{ title }}</h1>
             </div>
 
-            <div class="modal-text">
+            <div id="modal-text">
                 <!-- Actualiza el valor del innerHTML -->
                 <p v-html="text"></p>
+            </div>
+
+            <div id="modal-survey" v-if="has_survey">
+                <a class="btn-pointer" :href=survey target="_blank">{{survey_text}}</a>
             </div>
 
             <div class="modal-footer">
@@ -42,6 +46,9 @@ export default {
         return {
             instructor: INSTRUCTOR[0],
             phrases: INSTRUCTOR[0].phrases[this.$props.phraseID],
+            survey: "",
+            has_survey: false,
+            survey_text: "",
             timer: null,
             text: '',
             stop: false,
@@ -51,7 +58,8 @@ export default {
             title: "",
             btn_text: "Close",
             BGaudio: null,
-            audio_src: AUDIO_FILES.AUDIO_WRITE
+            audio_src: AUDIO_FILES.AUDIO_WRITE,
+            panel: null
         }
     },
     computed: {
@@ -71,7 +79,10 @@ export default {
                     i++;
                     const x = i % this.phrase.length;
                     this.text += this.phrase[x];
+                    this.panel.scrollTop = this.panel.scrollHeight;
                 }, this.speed );
+                
+                
             }
         },
         stopTypeWriter() {
@@ -86,22 +97,26 @@ export default {
         this.language_id = this.language.id;
         this.title = this.phrases.title[this.language_id]
         this.phrase = this.phrases.content[this.language_id];
+        this.survey = this.phrases.survey;
+        this.has_survey = this.phrases.has_survey;
         switch( this.language_id ) {
             case 1:
                 this.btn_text = "Cerrar";
+                this.survey_text = "Encuesta AQUI";
                 break;
             default: 
                 this.btn_text = "Close";
+                this.survey_text = "Survey HERE";
                 break;
         }
         
         /**AUDIO**/
         this.BGaudio = new Audio( require(`@/${this.audio_src}`));
-        this.BGaudio.volume = 0.5;
+        this.BGaudio.volume = 0.6;
         this.BGaudio.playbackRate = 0.9;
         this.BGaudio.play();
         this.BGaudio.addEventListener( 'ended', this.playSound );
-
+        this.panel = document.getElementById("modal-text");
         this.printTypeWriter();
     },
     watch: {
@@ -128,12 +143,12 @@ export default {
 
 .modal {
     position: absolute;
-    height: 40%;
+    height: 55%;
     width: 80%;
     background: white;
     border-radius: 10px;
     left: 50%;
-    top: 30%;
+    top: 37%;
     z-index: 1;
     transform: translate(-50%, -50%);
 
@@ -170,12 +185,16 @@ export default {
     grid-area: modal-content;
 
     display: grid;
-    grid-template-rows: 20% 60% 20%;
+    grid-template-rows: 20% 50% 14% 14%;
     grid-template-areas: 
         "content-header"
         "content-body"
+        "content-link"
         "content-footer";
     padding: 5px;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
 }
 
 /**PARTE SUPERIOR DEL CONTENIDO**/
@@ -195,14 +214,15 @@ export default {
 }
 
 /**PARTE CENTRAL DEL CONTENIDO**/
-.modal-text {
+#modal-text {
     grid-area: content-body;
-    overflow: hidden;
     padding: 5px;
     text-align: left;
+    overflow-y: auto;
+    max-height: 100%;
 }
 
-.modal-text p {
+#modal-text p {
     font-size:calc(5px + 1.4vh);
     color: #000000; 
     word-wrap: break-word;
@@ -210,6 +230,11 @@ export default {
 }
 
 /**FOOTER DEL CONTENIDO**/
+.modal-survey {
+    grid-area: content-link;
+    padding: 5px;
+}
+
 .modal-footer {
     grid-area: content-footer;
     padding: 5px;

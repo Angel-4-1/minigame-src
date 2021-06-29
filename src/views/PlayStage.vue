@@ -23,7 +23,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { STAGES as stages_constants } from '@/consts.js';
+import { STAGES as stages_constants, AUDIO_FILES } from '@/consts.js';
 import CharacterSelection from '@/components/CharacterSelection.vue'
 import LevelSelection from '@/components/LevelSelection.vue'
 import MainGame from '@/components/MainGame.vue'
@@ -47,7 +47,10 @@ export default {
             levelIsNotSelected: true,
             levelID: 0,
             characterID: 0,
-            score: 0
+            score: 0,
+            BGaudio: null,
+            audio_src: AUDIO_FILES.AUDIO_CONFIG,
+            inGame: false
         }
     },
     computed: {
@@ -72,8 +75,18 @@ export default {
             this.$emit('gameIsOver', data );
         }, 
         canStartTheGame() {
-            return ( this.characterIsNotSelected == false && this.levelIsNotSelected == false );
-        }
+            if ( this.characterIsNotSelected == false && this.levelIsNotSelected == false )
+            {
+                this.inGame = true;
+            } else {
+                this.inGame = false;
+            }
+            return this.inGame;
+        },
+        playSound() {
+            this.BGaudio.currentTime = 0;
+            this.BGaudio.play(); 
+        },
     },
     //al acceder por primera vez
     created() {
@@ -92,6 +105,28 @@ export default {
             this.levelIsNotSelected = false;
             this.characterID = prevC;
             this.levelID = prevL;
+        }
+
+        /**AUDIO**/
+        if (!this.inGame) {
+            this.BGaudio = new Audio( require(`@/${this.audio_src}`));
+            this.BGaudio.volume = 0.1;
+            this.BGaudio.play();
+            this.BGaudio.addEventListener( 'ended', this.playSound );
+        }
+    },
+    unmounted() {
+    //    this.BGaudio.pause();
+    //    this.BGaudio.currentTime = 0;
+    //    this.BGaudio.removeEventListener( 'ended', this.playSound );
+    },
+    watch: {
+        inGame: function() {
+            if( this.inGame ) {
+                this.BGaudio.pause();
+                this.BGaudio.currentTime = 0;
+                this.BGaudio.removeEventListener( 'ended', this.playSound );
+            }
         }
     }
 }

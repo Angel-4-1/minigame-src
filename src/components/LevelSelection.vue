@@ -53,7 +53,8 @@
                 <h1 class="card-header">{{ level.name[language_id] }}</h1>
                 <p class="card-text">{{ level.description[language_id] }}</p>
               </div>
-              <button class="card-btn btn-pointer" @click="levelIsSelected(current_level)"> {{ buttons.BUTTON_SELECT[language_id] }} </button>
+              <button :disabled="level.locked" v-bind:class="[level.locked ? 'card-btn-locked btn-pointer' : 'card-btn btn-pointer']"
+              @click="levelIsSelected(current_level)"> {{ buttons.BUTTON_SELECT[language_id] }} </button>
             </div>
             
             
@@ -106,7 +107,8 @@ export default {
         blurClass: 'blur',
         phraseID: 0,
         language_id: 0,
-        buttons: BUTTONS
+        buttons: BUTTONS,
+        isDisabled: true
       }
     },
     computed: {
@@ -147,6 +149,10 @@ export default {
     mounted() {
       this.language_id = this.language.id;
       this.isOpen = this.enablePopUp;
+      if(this.isOpen == false) {
+        this.phraseID = 3;
+        this.isOpen = true;
+      }
       this.current_level = 0;
       for ( let i = 0; i < this.levels.length; i++ ) {
         this.levels[i].isActive = false;
@@ -302,7 +308,7 @@ h1 {
   overflow-y: auto;
 }
 
-.card-btn {
+.card-btn, .card-btn-locked {
   display: block;
   width: 100%;
   padding: 0.4rem;
@@ -335,6 +341,10 @@ h1 {
   margin-left: 1.5rem;
 }
 
+.card-btn-locked {
+  color: #d7dce9;
+  background-color: #9a9ca3;
+}
 /*Botones para cambiar de nivel*/
 .btn-prev, .btn-next {
   cursor: pointer;

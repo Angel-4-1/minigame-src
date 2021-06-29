@@ -10,7 +10,7 @@
                     <span @click="toggleCard()" class="toggle-card btn-pointer">I</span>
                     
                     <div class="detail-header">
-                        <span class="header-title"><h2>{{ character.name }}</h2></span>
+                        <span class="header-title"><h2>{{ character.name[language_id] }}</h2></span>
                     </div>
 
                     <div class="detail-content-front">
@@ -69,7 +69,6 @@ import { CHARACTERS, BUTTONS, TITLES } from '@/consts.js';
 export default {
     name: 'CharacterDetail',
     props: [
-        'imageUrl',
         'characterID'
     ],
     emits: [ 'closeDetail', 'characterIsSelected' ],    //aquello que emitimos al padre

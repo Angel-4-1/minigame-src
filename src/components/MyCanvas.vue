@@ -19,7 +19,6 @@ import * as EXPLOSION from '../game/explosion.js';
 import * as RESOURCE from '../game/resources.js';
 import * as UTILS from '../game/utils.js';
 import * as GAMEMAP from '../game/gamemap.js';
-import * as PARTICLE from '../game/particles.js';
 import * as SNOW from '../game/snow.js';
 import * as FLOATINGMESSAGE from '../game/floatingMessage.js';
 
@@ -52,7 +51,7 @@ export default {
 
             /**OBSTACULOS**/
             obstacles: [],
-            obstacles_interval: 100,    //separacion entre obstaculos
+            obstacles_interval: 300,    //separacion entre obstaculos
             obs_img: null,
             obs_minY: 999,
             obs_minX: 999,
@@ -64,7 +63,7 @@ export default {
 
             /**RESOURCES**/
             resources: [],
-            resources_interval: 400,
+            resources_interval: 300,
             res_img: null,
             resource_audio_src: AUDIO_FILES.AUDIO_RESOURCE,
             health_audio_src: AUDIO_FILES.AUDIO_HEALTH,
@@ -126,6 +125,7 @@ export default {
             full_size: false,
             ratio: 1,
             show_fps: false,
+            show_time: false,
 
             /**FRAMES**/
             total_frames: 0,
@@ -225,7 +225,7 @@ export default {
                         this.continueGame();
                     }
                 } else if ( this.character.has_ability && this.ability_button != null ) {
-                    if ( this.ability_button.isHit(x,y) ) {
+                    if ( this.ability_button.isHit(x,y) && !this.ability_isActive ) {
                         this.ability_isActive = !this.ability_isActive;
                         switch (this.character.ability) {
                             case "Darkness":
@@ -309,8 +309,11 @@ export default {
                     case 76:    // L
                         this.player.lives += 50;
                         break;
+                    case 84:    // T
+                        this.show_time = !this.show_time;
+                        break;
                     default:
-                        console.log( event.keyCode)
+                        //console.log( event.keyCode)
                         break;
                 }
             } else {
@@ -332,6 +335,7 @@ export default {
                 var that = this;
                 setTimeout(function(){ 
                     that.makeSnow( false );
+                    that.ability_isActive = false;
                 }, 5000);
             } else {
                 this.changeTileset( MAPS[ LEVELS[this.level].map ].tileset );
@@ -351,7 +355,7 @@ export default {
             //Texto
             this.context.font = "60px Press Start 2P";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
-            this.context.fillText("S: " + this.score, 450, 70);
+            this.context.fillText("Score: " + this.score, 30, 70);
             //var img = this.getImage( require(`@/assets/heart.png`) );
             UTILS.drawImageAtPoint(this.context, this.heart_img, 0, 0, 128, 128, 750, 50, 120, 120);
             this.context.fillText(this.player.lives, 732, 72);
@@ -399,7 +403,7 @@ export default {
                     var explosion_rnd = Math.floor(Math.random() * this.explosion_imgs.length);
                     this.collisionSound.play();
                     this.explosions.push(
-                        new EXPLOSION.Explosion( this.explosion_imgs[explosion_rnd], this.obstacles[i].x, this.obstacles[i].y, 250, 250, 250)
+                        new EXPLOSION.Explosion( this.explosion_imgs[explosion_rnd], this.obstacles[i].x, this.obstacles[i].y, 125, 125, 125)
                     );
 
                     var alive = this.player.updateLive();
@@ -466,20 +470,37 @@ export default {
             }
 
             if ( this.total_frames % this.obstacles_interval == 0 ) {
-                var obs = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, this.obs_minY, this.obs_minX, false );
+                var obs = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, this.obs_minY, [this.obs_minX], false );
                 if ( obs != null ) {
                     this.obstacles.push( obs );
 
-                    var rnd = Math.floor( Math.random() * 2)
+                    //Número random para saber si se va a crear un segundo objeto o no (50% probabilidades)
+                    var rnd = Math.floor( Math.random() * 2);
 
-                    if ( this.levelID == 2 && rnd == 0 ){
+                    //Si estamos en el primer nivel, crearlo solo si se ha conseguido mas de 10 puntos en el juego
+                    //No crear segundo obstaculo en el nivel con ID = 1 (nivel de oscilaciones)
+                    if ( (this.levelID == 2 || this.score >= 10) && rnd == 0 && this.levelID != 1 ){
                         var x = obs.x;
                         var y = obs.y;
                         // Segundo obstaculo
-                        var obs2 = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, y, x, true );
+                        var obs2 = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, y, [x], true );
                         if ( obs2 != null ) {
                             this.obstacles.push( obs2 );
+
+                            rnd = Math.floor( Math.random() * 2)
+
+                            // Tercer objeto solo en el nivel 3 (nivel de mas obstaculos)
+                            if ( this.levelID == 2 && rnd == 0 && this.score >= 15) {
+                                var x2 = obs2.x;
+                                // Segundo obstaculo
+                                var obs3 = OBSTACLE.createObstacle( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.spawn_points, this.level, y, [x,x2], true );
+                                if ( obs3 != null ) {
+                                    this.obstacles.push( obs3 );
+                                }
+                            }
                         }
+
+                        
                     }
                 }
 
@@ -572,6 +593,11 @@ export default {
 
             this.total_frames++;
 
+            // if (this.total_frames % 100 == 0) {
+            //     var new_gamespeed = this.gamespeed + 0.5;
+            //     this.gamespeed = parseFloat( new_gamespeed.toFixed(2) );
+            // }
+
             //Loop infinito
             if ( this.status ) {
                 this.globalID_animation = window.requestAnimationFrame(this.render);
@@ -584,7 +610,9 @@ export default {
             //Texto
             this.context.font = "40px 'Press Start 2P'";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
-            this.context.fillText("Time: " + this.active_time, 20, 70);
+            if (this.show_time){
+                this.context.fillText("Time: " + this.active_time, 20, 300);
+            }
         },
         drawFPS() {
             //FPS
@@ -598,7 +626,7 @@ export default {
 
             this.context.font = "40px 'Press Start 2P'";
             this.context.fillStyle = "rgba(0, 0, 0, 1)";
-            this.context.fillText("FPS: " + this.frameLastSecond, 15, 200);
+            this.context.fillText("FPS: " + this.frameLastSecond, 28, 200);
         },
         changeTileset( new_tileset ) {
             try {
@@ -610,7 +638,7 @@ export default {
         },
         resetCanvas( elapsed_time ) {
             //Resetar canvas
-            this.context.fillStyle = "rgba(255, 255, 255, 1)";
+            this.context.fillStyle = "rgba(210, 207, 207, 1)";
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
             //Fondo
             //this.background.handleBackground(this.gamespeed, this.context);
@@ -624,9 +652,10 @@ export default {
             this.status = true;
             this.score = 0;
             this.collisions = 0;
+            this.clearObstacles();
+            this.clearResources();
             this.obstacles.length = 0;
             this.resources.length = 0;
-            this.obstacles = OBSTACLE.initObstacles( this.obs_img, this.obs_sizeX, this.obs_sizeY, this.obstacles, this.spawn_points); 
         },
         onResize() {
             if ( this.full_size ) {
@@ -679,6 +708,9 @@ export default {
         },
         checkAllLoaded() {
             if ( this.images_current = this.images_preload ) {
+                if (this.player == null || this.pause_button == null || this.background == null || this.obs_img == null || this.game_map == null || this.res_img == null || this.heart_img == null ) {
+                    return false;
+                }
                 console.log("FINISHED " + this.images_current + "/" + this.images_preload);
                 return true;
             }
@@ -695,6 +727,7 @@ export default {
         }
     },
     mounted() {
+        this.images_current = 0;
         var regex =  /iPhone|iPad|iPod|Android/i;
         var isMobile = regex.test(navigator.userAgent);
         if ( isMobile ) {
@@ -802,7 +835,6 @@ export default {
             that.images_current++;
         });
         
-
         /**OBSTACULOS**/
         this.obs_img = this.getImage( require(`@/assets/obstacles.png`) );
         this.obs_img.addEventListener("load", function(event) { 
@@ -910,7 +942,7 @@ export default {
                 that.globalID_animation = window.requestAnimationFrame(that.render);
                 clearInterval(that.finish);
             }
-        }, 1000);
+        }, 2000);
 
     },
     unmount() {
@@ -926,6 +958,7 @@ export default {
         document.removeEventListener('pause', this.cancelAnimation);
         document.removeEventListener('play', this.startAnimation);
         this.status = false;
+        this.images_current = 0;
     }
 
 }

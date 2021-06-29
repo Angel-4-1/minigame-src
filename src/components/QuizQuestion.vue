@@ -241,6 +241,9 @@ h1 {
     z-index: 10;
 }
 
+.quiz-header h1 {
+    font-size: min( 3vw, 22px);
+}
 
 /*BOTONES*/
 .quiz-buttons {

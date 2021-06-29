@@ -76,6 +76,8 @@ export function createResource( _sprite, spawn_points, minY = 0 ) {
 }
 
 const OBS_TYPE = [
+    //Mayor probabilidad de que sala el quiz
+    { type: "QUIZ"         , x: 0    , y: 0 },
     { type: "QUIZ"         , x: 0    , y: 0 },
     { type: "HEALTH"       , x: 100  , y: 0 }
 ]
